@@ -2,24 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum PlayerActionType {Forward, TurnLeft, TurnRight, TurnBack, Jump, Attack};
+public enum PlayerActionType {Forward, TurnLeft, TurnRight, TurnBack, Jump, Attack, None};
 
 public class PlayerAction {
+    PlayerAction()
+    {
+        timeInSlot = 0.f;
+        actionType = PlayerActionType.None;
+    }
+
     float timeInSlot;
     PlayerActionType actionType;
 }
 
 public class InputController : MonoBehaviour {
-    ArrayList actions;
+    List<PlayerAction> actions;
 
 	// Use this for initialization
 	void Start () {
         PlayerAction action = new PlayerAction();
-        PlayerActionType type = PlayerActionType.Forward;
 
         actions.Add(action);
-        actions.Add(2);
-        actions.Add(type);
 	}
 	
 	// Update is called once per frame
