@@ -5,14 +5,14 @@ using System.Collections.Generic;
 public enum PlayerActionType {Forward, TurnLeft, TurnRight, TurnBack, Jump, Attack, None};
 
 public class PlayerAction {
-    PlayerAction()
+    public PlayerAction()
     {
-        timeInSlot = 0.f;
+        timeInSlot = 0.0f;
         actionType = PlayerActionType.None;
     }
 
-    float timeInSlot;
-    PlayerActionType actionType;
+    protected float timeInSlot;
+    protected PlayerActionType actionType;
 }
 
 public class InputController : MonoBehaviour {
