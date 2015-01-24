@@ -5,19 +5,20 @@ using System.Collections.Generic;
 public class LevelGenerator : MonoBehaviour
 {
     public GameObject pathTile;
-    public List<GameObject> floor;
-    public List<GameObject> middle;
-    public List<GameObject> top;
-    public List<List<List<GameObject>>> levelGrid3d;
+    public List<GameObject> floorGO;
+    public List<GameObject> middleGO;
+    public List<GameObject> topGO;
+    public List<List<GameObject>> floorGrid;
     public int levelSize;
     public int seed;
     public float distanceProbability;
     public float forwardProbability;
-
+    public int maxNumberOfStreets;
     public List<float> floorPropability;
     public List<float> middlePropability;
     public List<float> topPropability;
-    private List<Vector2> path;
+    private List<Vector2> playerPath;
+    private List<List<Vector2>> streetPaths;
     private Vector2 p1Start;
     private Vector2 target;
 
@@ -29,22 +30,36 @@ public class LevelGenerator : MonoBehaviour
 
     void clearPath()
     {
-        foreach (Vector2 tile in path)
+        foreach (Vector2 tile in playerPath)
         {
-            GameObject.DestroyObject(levelGrid3d[2][(int)tile.x][(int)tile.y]);
-            GameObject.DestroyObject(levelGrid3d[1][(int)tile.x][(int)tile.y]);
             GameObject.Instantiate(pathTile, new Vector3(tile.x, 0, tile.y), Quaternion.identity);
+        }
+    }
+
+    void drawStreets()
+    {
+        foreach (List<Vector2> street in streetPaths)
+        {
+            foreach (Vector2 tile in street)
+            {
+                GameObject.DestroyObject(floorGrid [(int)tile.x] [(int)tile.y]);
+                floorGrid [(int)tile.x] [(int)tile.y] = GameObject.Instantiate(middleGO [0], new Vector3(tile.x, 0, tile.y), Quaternion.identity) as GameObject;
+            }
         }
     }
 
     void setupLevel()
     {
         p1Start.Set(0, 0);//Random.value * levelSize, Random.value * levelSize);
-        target.Set(levelSize-1, levelSize-1);//Random.value * levelSize, Random.value * levelSize);
+        target.Set(levelSize - 1, levelSize - 1);//Random.value * levelSize, Random.value * levelSize);
         Random.seed = seed;
-        computePath();
+        floorGrid = new List<List<GameObject>>();
+        computePathForPlayer();
         generateTiles();
         clearPath();
+
+        generateStreets();
+        drawStreets();
     }
 
     int computeDirection(int numTiles)
@@ -53,55 +68,60 @@ public class LevelGenerator : MonoBehaviour
         if (numTiles > 0)
         {
             direction = 1;
-        }
-        else if (numTiles < 0)
+        } else if (numTiles < 0)
         {
             direction = -1;
         }
         return direction;
     }
-    float computePathProbability(Vector2 current, Vector2 neighbor)
+
+    float computePathProbability(Vector2 current, Vector2 neighbor, Vector2 target)
     {
         float probability = 0;
-        if ((current.x + current.y) > (neighbor.x + neighbor.y))
+        if ((Mathf.Abs(current.x - target.x) + Mathf.Abs(current.y - target.y)) 
+            > (Mathf.Abs(neighbor.x - target.x) + Mathf.Abs(neighbor.y - target.y)))
         {
             probability = distanceProbability;
-        }
-        else
+        } else
         {
             probability = 1 - distanceProbability;
         }
-		if ( neighbor.x < 0 || neighbor.x >= levelSize || neighbor.y < 0 || neighbor.y >= levelSize)
+        if (neighbor.x < 0 || neighbor.x >= levelSize || neighbor.y < 0 || neighbor.y >= levelSize)
         {
             probability = 0;
         }
         return probability;
     }
 
-    void computePath()
+    void computePathForPlayer()
     {
         //compute diagonal path
-        path = new List<Vector2>();
-        Vector2 currentPosition = p1Start;
-		return;
-		while (((int)(currentPosition.x - target.x)) != 0 && ((int)(currentPosition.y - target.y)) != 0)
-		{
-            Vector2 left =   new Vector2(currentPosition.x - 1, currentPosition.y);
-            Vector2 right =  new Vector2(currentPosition.x + 1, currentPosition.y);
-            Vector2 top =    new Vector2(currentPosition.x    , currentPosition.y + 1);
-            Vector2 bottom = new Vector2(currentPosition.x    , currentPosition.y - 1);
-            float probabilityLeft = computePathProbability(currentPosition, left);
-            float probabilityRight = computePathProbability(currentPosition, right);
-            float probabilityTop = computePathProbability(currentPosition, top);
-            float probabilityBottom = computePathProbability(currentPosition, bottom);
+        playerPath = computePathBetweenPoints(p1Start, target); 
+    }
+
+    List<Vector2> computePathBetweenPoints(Vector2 start, Vector2 target)
+    {
+        Vector2 currentPosition = start;
+        List<Vector2> path = new List<Vector2>();
+        while (((int)(currentPosition.x - target.x)) != 0 || ((int)(currentPosition.y - target.y)) != 0)
+        {
+            Vector2 left = new Vector2(currentPosition.x - 1, currentPosition.y);
+            Vector2 right = new Vector2(currentPosition.x + 1, currentPosition.y);
+            Vector2 top = new Vector2(currentPosition.x, currentPosition.y + 1);
+            Vector2 bottom = new Vector2(currentPosition.x, currentPosition.y - 1);
+            float probabilityLeft = computePathProbability(currentPosition, left, target);
+            float probabilityRight = computePathProbability(currentPosition, right, target);
+            float probabilityTop = computePathProbability(currentPosition, top, target);
+            float probabilityBottom = computePathProbability(currentPosition, bottom, target);
+
             float sum = probabilityLeft + probabilityRight + probabilityTop + probabilityBottom;
             probabilityLeft /= sum;
-			probabilityRight = probabilityRight / sum +  probabilityLeft;
-			probabilityTop = probabilityTop / sum + probabilityRight;
-			probabilityBottom = probabilityBottom / sum + probabilityTop;
+            probabilityRight = probabilityRight / sum + probabilityLeft;
+            probabilityTop = probabilityTop / sum + probabilityRight;
+            probabilityBottom = probabilityBottom / sum + probabilityTop;
 
             float randomNumber = Random.value;
-            
+
             if (randomNumber < probabilityLeft)
             {
                 path.Add(left);
@@ -115,13 +135,11 @@ public class LevelGenerator : MonoBehaviour
             {
                 path.Add(bottom);
             }
-			currentPosition = path[path.Count -1];
-            
+            currentPosition = path[path.Count - 1];
         }
-        
+
+        return path;
     }
-
-
 
     List<float> computeDensity(List<float> probabilityList)
     {
@@ -139,56 +157,47 @@ public class LevelGenerator : MonoBehaviour
     {
 
         List<List<float>> objectDensities = new List<List<float>>();
-        objectDensities.Add(computeDensity(floorPropability));
-        objectDensities.Add(computeDensity(middlePropability));
-        objectDensities.Add(computeDensity(topPropability));
+        floorPropability = computeDensity(floorPropability);
+//        objectDensities.Add(computeDensity(middlePropability));
+//        objectDensities.Add(computeDensity(topPropability));
+//
+//        objectTypes.Add(middle);
+//        objectTypes.Add(top);
+//        levelGrid3d = new List<List<List<GameObject>>>();
+//
+//        List<GameObject> currentObjects = new List<GameObject>();
+//        List<float> curDensity = new List<float>();
 
-        List<List<GameObject>> objectTypes = new List<List<GameObject>>();
-        objectTypes.Add(floor);
-        objectTypes.Add(middle);
-        objectTypes.Add(top);
         Random.Range(0f, 1f);
-        levelGrid3d = new List<List<List<GameObject>>>();
-
-        List<GameObject> currentObjects = new List<GameObject>();
-        List<float> curDensity = new List<float>();
-        for (int y = 0; y <= 2; y++)
+        for (int x = 0; x < this.levelSize; x++)
         {
-            curDensity.Clear();
-            curDensity.AddRange(objectDensities[y]);
-
-            currentObjects.Clear();
-            levelGrid3d.Add(new List<List<GameObject>>());
-            currentObjects.AddRange(objectTypes[y]);
-
-            for (int x = 0; x < levelSize; x++)
+            floorGrid.Add(new List<GameObject>());
+            for (int z = 0; z < this.levelSize; z++)
             {
-                levelGrid3d[y].Add(new List<GameObject>());
-                for (int z = 0; z < levelSize; z++)
+                float randomValue = Random.value;
+                for (int i = 0; i < floorPropability.Count; i++)
                 {
-                    float randomNumber = Random.value;
-                    for (int i = 0; i < curDensity.Count; i++)
+                    if (randomValue < floorPropability [i])
                     {
-                        levelGrid3d[y][x].Add(null);
-                        if (randomNumber < curDensity[i])
-                        {
-                            if (y > 0)
-                            {
-                                if (levelGrid3d[y - 1][x][z] != null)
-                                {
-                                    levelGrid3d[y][x][z] = ((GameObject)GameObject.Instantiate(currentObjects[i], new Vector3(x, y, z), Quaternion.identity));
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                levelGrid3d[y][x][z] = ((GameObject)GameObject.Instantiate(currentObjects[i], new Vector3(x, y, z), Quaternion.identity));
-                            }
-
-                        }
+                        floorGrid [x].Add(GameObject.Instantiate(floorGO [i], new Vector3(x, 0, z), Quaternion.identity) as GameObject);
+                        break;
                     }
                 }
+          
             }
+        }
+
+    }
+
+    void generateStreets()
+    {
+        streetPaths = new List<List<Vector2>>();
+        int numberOfStreets = (int)(maxNumberOfStreets * Random.value);
+        for (int i = 0; i < numberOfStreets; i++)
+        {
+            Vector2 start = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
+            Vector2 end = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
+            streetPaths.Add(computePathBetweenPoints(start, end));
         }
     }
 
