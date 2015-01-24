@@ -14,11 +14,13 @@ public class LevelGenerator : MonoBehaviour
     public float distanceProbability;
     public float forwardProbability;
     public int maxNumberOfStreets;
+    public int maxNumberOfWater;
     public List<float> floorPropability;
     public List<float> middlePropability;
     public List<float> topPropability;
     private List<Vector2> playerPath;
     private List<List<Vector2>> streetPaths;
+    private List<List<Vector2>> waterPaths;
     private Vector2 p1Start;
     private Vector2 target;
 
@@ -48,6 +50,18 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
+    void drawWater()
+    {
+        foreach (List<Vector2> water in waterPaths)
+        {
+            foreach (Vector2 tile in water)
+            {
+                GameObject.DestroyObject(floorGrid [(int)tile.x] [(int)tile.y]);
+                floorGrid [(int)tile.x] [(int)tile.y] = GameObject.Instantiate(middleGO [1], new Vector3(tile.x, 0, tile.y), Quaternion.identity) as GameObject;
+            }
+        }
+    }
+
     void setupLevel()
     {
         p1Start.Set(0, 0);//Random.value * levelSize, Random.value * levelSize);
@@ -60,6 +74,9 @@ public class LevelGenerator : MonoBehaviour
 
         generateStreets();
         drawStreets();
+
+        generateWater();
+        drawWater();
     }
 
     int computeDirection(int numTiles)
@@ -198,6 +215,18 @@ public class LevelGenerator : MonoBehaviour
             Vector2 start = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
             Vector2 end = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
             streetPaths.Add(computePathBetweenPoints(start, end));
+        }
+    }
+
+    void generateWater()
+    {
+        waterPaths = new List<List<Vector2>>();
+        int numberOfWater = (int)(maxNumberOfWater * Random.value);
+        for (int i = 0; i < numberOfWater; i++)
+        {
+            Vector2 start = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
+            Vector2 end = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
+            waterPaths.Add(computePathBetweenPoints(start, end));
         }
     }
 
