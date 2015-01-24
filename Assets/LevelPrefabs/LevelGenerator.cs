@@ -11,6 +11,10 @@ public class LevelGenerator : MonoBehaviour
     public int levelSize;
     public int seed;
 
+    public List<float> floorPropability;
+    public List<float> middlePropability;
+    public List<float> topPropability;
+
     // Use this for initialization
     void Start()
     {
