@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
+using System.Text;
 
 public class GUINetworkState : MonoBehaviour
 {
@@ -21,6 +23,27 @@ public class GUINetworkState : MonoBehaviour
             GUI.Label (new Rect (15, Screen.height - 25, Screen.width, 20), GameStatusText () + " | " + Application.loadedLevelName);
         }
 
+        GUILayout.BeginArea (new Rect (50, 50, 150, 600));
+        GUILayout.TextArea (PopulatePlayerListString ());
+        GUILayout.EndArea ();
+
+    }
+
+    string PopulatePlayerListString ()
+    {
+//        string pList = "";
+        StringBuilder pList = new StringBuilder ();
+
+        for (int i = 0; i < GameManager.singleton.players.Count; i++) {
+            PlayerData curPlayer = GameManager.singleton.players [i];
+
+            pList.Append (curPlayer.networkPlayer);
+            pList.Append (" | ");
+            pList.Append (curPlayer.localPlayerId);
+            pList.AppendLine ();
+        }
+
+        return pList.ToString ();
     }
 
     string GameStatusText ()

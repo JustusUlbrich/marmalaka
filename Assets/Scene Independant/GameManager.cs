@@ -1,6 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
+public class PlayerData
+{
+    public PlayerData (NetworkPlayer netPlayerParam, int localPlayerIdParam)
+    {
+        networkPlayer = netPlayerParam;
+        localPlayerId = localPlayerIdParam;
+    }
+
+    public NetworkPlayer networkPlayer;
+    public int localPlayerId;
+}
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +22,10 @@ public class GameManager : MonoBehaviour
     private int gameMode = -1;
     private int lastLevelPrefix = 0;
 
+    public int localPlayerCount = 3;
+
+    public IList<PlayerData> players;
+
     void Awake ()
     {
         if (singleton == null) {
@@ -18,6 +34,8 @@ public class GameManager : MonoBehaviour
             Destroy (gameObject);
             return;
         }
+
+        players = new List<PlayerData> ();
 
         DontDestroyOnLoad (gameObject);
     }
@@ -32,12 +50,119 @@ public class GameManager : MonoBehaviour
 
         Network.InitializeServer (5, port, false);
 
+        for (int i = 0; i < singleton.localPlayerCount; i ++) {
+            PlayerData newP = new PlayerData (Network.player, i);
+            //newPlayers.Add (newP);
+            singleton.players.Add (newP);
+        }
+
         singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "SceneLobby", singleton.lastLevelPrefix + 1);
 
         Debug.Log ("Loaded Lobby");
 
     }
 
+    public void OnPlayerConnected (NetworkPlayer player)
+    {
+    }
+
+    [RPC]
+    public void NewClient (int newClientPlayerCount, NetworkMessageInfo msgInfo)
+    {
+        if (!Network.isServer)
+            Debug.LogError ("Received Server Message as Client!!");
+
+        //SendPlayerList (msgInfo.sender);
+
+        //IList<PlayerData> newPlayers = new List<PlayerData> ();
+
+        for (int i = 0; i < newClientPlayerCount; i ++) {
+            PlayerData newP = new PlayerData (msgInfo.sender, i);
+            //newPlayers.Add (newP);
+            players.Add (newP);
+        }
+
+
+        //SendPlayerList (newPlayers);
+
+        SendFullPlayerList ();
+
+    }
+
+    public void OnConnectedToServer ()
+    {
+
+        // TODO read no. of local players!
+
+        // Send local client info to server
+        // // local player count
+        networkView.RPC ("NewClient", RPCMode.Server, localPlayerCount);
+    }
+
+    [RPC]
+    public void AddPlayer (NetworkPlayer newPlayer, int localId)
+    {
+        players.Add (new PlayerData (newPlayer, localId));
+    }
+
+    public void SendFullPlayerList ()
+    {
+        networkView.RPC ("DoDeletePlayerList", RPCMode.Others);
+
+        foreach (PlayerData pData in players) {
+            networkView.RPC ("AddPlayer", RPCMode.Others, pData.networkPlayer, pData.localPlayerId);
+        }
+    }
+
+    [RPC]
+    public void DoDeletePlayerList ()
+    {
+        players.Clear ();
+    }
+
+    public void SendPlayerList (NetworkPlayer receiver)
+    {
+
+        foreach (PlayerData pData in players) {
+            networkView.RPC ("AddPlayer", receiver, pData.networkPlayer, pData.localPlayerId);
+        }
+
+    }
+
+    public void SendPlayerList (IList<PlayerData> playerList)
+    {
+        
+        foreach (PlayerData pData in playerList) {
+            networkView.RPC ("AddPlayer", RPCMode.All, pData.networkPlayer, pData.localPlayerId);
+        }
+        
+    }
+
+    public void OnPlayerDisconnected (NetworkPlayer netPlayer)
+    {
+
+        networkView.RPC ("RemovePlayer", RPCMode.All, netPlayer);
+
+
+    }
+
+    [RPC]
+    public void RemovePlayer (NetworkPlayer netPlayer)
+    {
+
+        IList<PlayerData> idsToRemove = new List<PlayerData> ();
+        
+        for (int i = 0; i < players.Count; i ++) {
+            if (players [i].networkPlayer == netPlayer) {
+                idsToRemove.Add (players [i]);
+            }
+        }
+        
+        for (int i = 0; i < idsToRemove.Count; i ++) {
+            players.Remove (idsToRemove [i]);
+        }
+
+    }
 
     public static void StartGame ()
     {
@@ -90,6 +215,8 @@ public class GameManager : MonoBehaviour
 
     }
 
+
+
     public static void ConnectToHost (string ip, int port)
     {
 
@@ -103,11 +230,15 @@ public class GameManager : MonoBehaviour
             Debug.LogError ("Disconnected from Server.");
         }
         //networkView.RPC ("LoadLevel", RPCMode.AllBuffered, level, lastLevelPrefix + 1);
+        Destroy (gameObject);
+        Application.LoadLevel ("SceneMainMenu");
     }
 
     void OnFailedToConnect (NetworkConnectionError error)
     {
         Debug.LogError ("Could not connect to server: " + error);
         //networkView.RPC ("LoadLevel", RPCMode.AllBuffered, level, lastLevelPrefix + 1);
+        Destroy (gameObject);
+        Application.LoadLevel ("SceneMainMenu");
     }
 }
