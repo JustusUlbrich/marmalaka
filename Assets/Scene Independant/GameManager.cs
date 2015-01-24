@@ -29,6 +29,20 @@ public class GameManager : MonoBehaviour
 
 		}
 
+
+		public void StartGame ()
+		{
+
+				networkView.RPC ("InvokeLevelLoad", RPCMode.AllBuffered, "SceneLevel");
+
+		}
+
+		[RPC]
+		void InvokeLevelLoad (string sceneName)
+		{
+				Application.LoadLevel (sceneName);
+		}
+
 		public void ConnectToHost (string ip, int port)
 		{
 
@@ -48,7 +62,9 @@ public class GameManager : MonoBehaviour
 
 		void OnDisconnectedFromServer ()
 		{
-				Debug.LogError ("Disconnected from Server.");
+				if (Network.isClient) {
+						Debug.LogError ("Disconnected from Server.");
+				}
 				Application.LoadLevel ("SceneMainMenu");
 		}
 
