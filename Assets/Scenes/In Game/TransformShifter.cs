@@ -4,13 +4,28 @@ using System.Collections;
 public class TransformShifter : MonoBehaviour
 {
 
+    public Camera cam;
+
     void Update ()
     {
 	
-        float xShift = Input.GetAxis ("Horizontal");
-        float yShift = Input.GetAxis ("Vertical");
+        float forwardShift = Input.GetAxis ("Vertical");
+        float horizontalShift = Input.GetAxis ("Horizontal");
 
-        transform.position += new Vector3 (xShift, 0, yShift) * Time.deltaTime;
+        Vector3 projectedCamForward = cam.transform.forward;
+        projectedCamForward.y = 0;
+
+        projectedCamForward.x = projectedCamForward.x * forwardShift;
+        projectedCamForward.z = projectedCamForward.z * forwardShift;
+
+        Vector3 projectedCamRight = cam.transform.right;
+        projectedCamRight.y = 0;
+        
+        projectedCamRight.x = projectedCamRight.x * horizontalShift;
+        projectedCamRight.z = projectedCamRight.z * horizontalShift;
+
+        transform.position += projectedCamForward * Time.deltaTime * 5;
+        transform.position += projectedCamRight * Time.deltaTime * 5;
 
     }
 }
