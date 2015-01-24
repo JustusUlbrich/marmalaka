@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
+[Serializable]
 public class SlotTimerData
 {
-    public SlotTimerData() 
+    public SlotTimerData ()
     { 
     
     }
@@ -12,7 +14,8 @@ public class SlotTimerData
     public int slotSequenceNo = 0;
 }
 
-public class SlotTimerScript : MonoBehaviour {
+public class SlotTimerScript : MonoBehaviour
+{
     private SlotTimerData timerData;
 
     //TODO move me into settings and keep it private
@@ -20,36 +23,36 @@ public class SlotTimerScript : MonoBehaviour {
 
     public static SlotTimerScript singleton;
 
-    void Awake() {
-        if (singleton == null)
-        {
+    void Awake ()
+    {
+        if (singleton == null) {
             singleton = this;
-        }
-        else
-        {
-            Destroy(gameObject);
+        } else {
+            Destroy (gameObject);
         }
     }
 
-	// Use this for initialization
-	void Start () {
-        timerData = new SlotTimerData();
-	}
+    // Use this for initialization
+    void Start ()
+    {
+        timerData = new SlotTimerData ();
+    }
 	
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update ()
+    {
         timerData.timeInSlot += Time.deltaTime;
 
-        if (timerData.timeInSlot >= maxSlotTime)
-        {
+        if (timerData.timeInSlot >= maxSlotTime) {
             timerData.timeInSlot -= maxSlotTime;
 
             timerData.slotSequenceNo++;
         }
             
-	}
+    }
 
-    public static SlotTimerData getTimerData() {
+    public static SlotTimerData getTimerData ()
+    {
         return singleton.timerData;
     }
 
