@@ -14,7 +14,7 @@ public class GUIConnect : MonoBehaviour
     public int gameMode = 0;
     private string[] gameModeStrings = {"Battle Arena", "Duck, Duck, Noob!", "Training Ground"};
 
-    public bool serverMode = false;
+    private bool serverMode = true;
 
     void OnGUI ()
     {
