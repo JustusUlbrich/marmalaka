@@ -52,16 +52,20 @@ public class InputController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        checkKeyboardInput ();
+        //TODO get local player count
+        int localPlayerCount = 2;
+
+        for (int playerID = 0; playerID < localPlayerCount; ++playerID )
+            checkKeyboardInput(playerID);
 
     }
 
-    void checkKeyboardInput ()
+    void checkKeyboardInput (int playerID)
     {
         PlayerAction action = new PlayerAction ();
 
-        action.localPlayerId = 0;
-        string playerString = "P1";
+        action.localPlayerId = playerID;
+        string playerString = "P" + (playerID);
 
         if (Input.GetButtonDown (playerString + "Forward"))
             action.actionType = PlayerActionType.Forward;
@@ -75,7 +79,6 @@ public class InputController : MonoBehaviour
             action.actionType = PlayerActionType.Jump;
         else if (Input.GetButtonDown (playerString + "Attack"))
             action.actionType = PlayerActionType.Attack;
-
 
         if (action.actionType != PlayerActionType.Undefined) {
             action.timerData = SlotTimerScript.getTimerData ();
