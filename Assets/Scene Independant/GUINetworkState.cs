@@ -23,8 +23,16 @@ public class GUINetworkState : MonoBehaviour
             GUI.Label (new Rect (15, Screen.height - 25, Screen.width, 20), GameStatusText () + " | " + Application.loadedLevelName);
         }
 
-        GUILayout.BeginArea (new Rect (50, 50, 150, 600));
+
+        GUILayout.BeginArea (new Rect (20, 20, 120, 600));
+        GUILayout.BeginVertical ();
+        GUILayout.BeginHorizontal ();
+        GUILayout.FlexibleSpace ();
+        GUILayout.Label ("Player List");
+        GUILayout.FlexibleSpace ();
+        GUILayout.EndHorizontal ();
         GUILayout.TextArea (PopulatePlayerListString ());
+        GUILayout.EndVertical ();
         GUILayout.EndArea ();
 
     }

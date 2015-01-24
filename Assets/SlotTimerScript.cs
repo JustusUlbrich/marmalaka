@@ -6,8 +6,19 @@ using System.Collections;
 public class SlotTimerData
 {
     public SlotTimerData ()
+    {
+    }
+
+    public SlotTimerData (SlotTimerData other)
     { 
-    
+        slotSequenceNo = other.slotSequenceNo;
+        timeInSlot = other.timeInSlot;
+    }
+
+    public SlotTimerData (int slotSequenceNoParam, float timeInSlotParam)
+    { 
+        slotSequenceNo = slotSequenceNoParam;
+        timeInSlot = timeInSlotParam;
     }
 
     public float timeInSlot = 0.0f;
@@ -46,14 +57,16 @@ public class SlotTimerScript : MonoBehaviour
         if (timerData.timeInSlot >= maxSlotTime) {
             timerData.timeInSlot -= maxSlotTime;
 
+            SendMessage ("TurnOver", timerData.slotSequenceNo, SendMessageOptions.RequireReceiver);
             timerData.slotSequenceNo++;
+
         }
             
     }
 
     public static SlotTimerData getTimerData ()
     {
-        return singleton.timerData;
+        return new SlotTimerData (singleton.timerData);
     }
 
 
