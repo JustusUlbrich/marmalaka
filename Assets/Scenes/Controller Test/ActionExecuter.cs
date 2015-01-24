@@ -26,15 +26,14 @@ public class ActionExecuter : MonoBehaviour
     {
         turnPlaying = turnNo;
     }
-
-    public static void QueueActions (IList<PlayerAction> newTurnMoves)
+    
+    public static void QueueActions (IList<PlayerAction> newTurnActions)
     {
-
-        if (newTurnMoves.Count != 0) {
-            //Debug.LogError ("Still have Actions to Execute");
+        if (singleton.turnMoves.Count != 0) {
+            Debug.LogError ("ACTION QUEUE NOT EMPTY ON NEW MOVE!");
         }
 
-        singleton.turnMoves = newTurnMoves;
+        singleton.turnMoves = newTurnActions;
 
     }
 

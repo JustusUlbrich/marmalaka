@@ -53,10 +53,9 @@ public class ActionAggregator : MonoBehaviour
         }
 
     }
-
+       
     public void TurnOver (int turnNo)
     {
-
         IList<PlayerAction> turnActionList = new List<PlayerAction> ();
 
         foreach (PlayerAction pAction in actionList) {
@@ -75,29 +74,11 @@ public class ActionAggregator : MonoBehaviour
     [RPC]
     public void AddAction (NetworkPlayer netPlayer, int localPlayerId, int actionType, int timeSlotNo, float deltaInSlot)
     {
-
-        if (!Network.isServer) {
-            Debug.LogError ("Server function called on Client!!");
-        }
-
         PlayerAction action = new PlayerAction (netPlayer, localPlayerId, actionType, timeSlotNo, deltaInSlot);
 
-        Debug.Log ("RECEIVED BY SERVER: " + action.AppendActionString (new StringBuilder ()).ToString ());
+        Debug.Log ("RECEIVED BY SERVER: " + DebugUtility.AppendPlayerActionString (new StringBuilder (), action).ToString ());
 
         InsertAction (action);
-    }
-
-    public void AddActionServerLocal (PlayerAction action)
-    {
-        
-        if (!Network.isServer) {
-            Debug.LogError ("Server function called on Client!!");
-        }
-        
-        Debug.Log ("RECEIVED BY SERVER: " + action.AppendActionString (new StringBuilder ()).ToString ());
-        
-        InsertAction (action);
-
     }
     
 }

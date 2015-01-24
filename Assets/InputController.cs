@@ -38,36 +38,6 @@ public class PlayerAction
         timerData.timeInSlot = (float)deltaInSlotParam;
     }
 
-    public StringBuilder AppendActionString (StringBuilder strBuilder, bool shortVersion = false)
-    {
-        if (shortVersion) {
-            strBuilder.Append (":: ");
-            strBuilder.Append (netPlayer);
-            strBuilder.Append (" | ");
-            strBuilder.Append (localPlayerId);
-            strBuilder.Append (" | ");
-            strBuilder.Append (actionType);
-            strBuilder.Append (" | ");
-            strBuilder.Append (timerData.slotSequenceNo);
-            strBuilder.Append (" | ");
-            strBuilder.Append (timerData.timeInSlot);
-            strBuilder.AppendLine ();
-        } else {
-            strBuilder.Append ("NetId: ");
-            strBuilder.Append (netPlayer);
-            strBuilder.Append (" | LocId: ");
-            strBuilder.Append (localPlayerId);
-            strBuilder.Append (" | ActType: ");
-            strBuilder.Append (actionType);
-            strBuilder.Append (" | Turn: ");
-            strBuilder.Append (timerData.slotSequenceNo);
-            strBuilder.Append (" | TurnDelta: ");
-            strBuilder.Append (timerData.timeInSlot);
-            strBuilder.AppendLine ();
-        }
-        return strBuilder;
-    }
-
     public NetworkPlayer netPlayer;
     public int localPlayerId;
     public PlayerActionType actionType;
@@ -117,13 +87,10 @@ public class InputController : MonoBehaviour
 
             action.timerData = SlotTimerScript.getTimerData ();
 
-            Debug.Log ("SENT TO SERVER: " + action.AppendActionString (new StringBuilder ()).ToString ());
+            Debug.Log ("SENT TO SERVER: " + DebugUtility.AppendPlayerActionString (new StringBuilder (), action).ToString ());
 
-            if (Network.isServer) {
-                SendMessage ("AddActionServerLocal", action, SendMessageOptions.RequireReceiver);
-            } else {
-                networkView.RPC ("AddAction", RPCMode.Server, action.netPlayer, action.localPlayerId, (int)action.actionType, action.timerData.slotSequenceNo, action.timerData.timeInSlot);
-            }
+            networkView.RPC ("AddAction", RPCMode.AllBuffered, action.netPlayer, action.localPlayerId, 
+                             (int)action.actionType, action.timerData.slotSequenceNo, action.timerData.timeInSlot);
         }
     }
 }
