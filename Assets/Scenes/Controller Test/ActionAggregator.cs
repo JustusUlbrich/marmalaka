@@ -38,9 +38,9 @@ public class ActionAggregator : MonoBehaviour
         while (currentIndex > 0) {
             PlayerAction compAction = singleton.actionList [currentIndex - 1];
 
-            if (compAction.timerData.slotSequenceNo > action.timerData.slotSequenceNo ||
-                compAction.timerData.slotSequenceNo == action.timerData.slotSequenceNo &&
-                compAction.timerData.timeInSlot > action.timerData.timeInSlot) {
+            if (compAction.timerData.turnNumber > action.timerData.turnNumber ||
+                compAction.timerData.turnNumber == action.timerData.turnNumber &&
+                compAction.timerData.timeInTurn > action.timerData.timeInTurn) {
 
                 currentIndex --;
 
@@ -59,7 +59,7 @@ public class ActionAggregator : MonoBehaviour
         IList<PlayerAction> turnActionList = new List<PlayerAction> ();
 
         foreach (PlayerAction pAction in actionList) {
-            if (pAction.timerData.slotSequenceNo == turnNo) {
+            if (pAction.timerData.turnNumber == turnNo) {
                 turnActionList.Add (pAction);
             }
         }

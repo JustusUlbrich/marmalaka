@@ -24,7 +24,7 @@ public class PlayerAction
     {
         localPlayerId = 0;
         actionType = PlayerActionType.Undefined;
-        timerData = new SlotTimerData ();
+        timerData = new TurnTimerData ();
     }
 
     public PlayerAction (NetworkPlayer netPlayerParam, int localPlayerIdParam, int actionTypeParam, int timeSlotNoParam, float deltaInSlotParam)
@@ -33,15 +33,45 @@ public class PlayerAction
         localPlayerId = (int)localPlayerIdParam;
         actionType = (PlayerActionType)actionTypeParam;
 
-        timerData = new SlotTimerData ();
-        timerData.slotSequenceNo = (int)timeSlotNoParam;
-        timerData.timeInSlot = (float)deltaInSlotParam;
+        timerData = new TurnTimerData ();
+        timerData.turnNumber = (int)timeSlotNoParam;
+        timerData.timeInTurn = (float)deltaInSlotParam;
+    }
+
+    public StringBuilder AppendActionString (StringBuilder strBuilder, bool shortVersion = false)
+    {
+        if (shortVersion) {
+            strBuilder.Append (":: ");
+            strBuilder.Append (netPlayer);
+            strBuilder.Append (" | ");
+            strBuilder.Append (localPlayerId);
+            strBuilder.Append (" | ");
+            strBuilder.Append (actionType);
+            strBuilder.Append (" | ");
+            strBuilder.Append (timerData.turnNumber);
+            strBuilder.Append (" | ");
+            strBuilder.Append (timerData.timeInTurn);
+            strBuilder.AppendLine ();
+        } else {
+            strBuilder.Append ("NetId: ");
+            strBuilder.Append (netPlayer);
+            strBuilder.Append (" | LocId: ");
+            strBuilder.Append (localPlayerId);
+            strBuilder.Append (" | ActType: ");
+            strBuilder.Append (actionType);
+            strBuilder.Append (" | Turn: ");
+            strBuilder.Append (timerData.turnNumber);
+            strBuilder.Append (" | TurnDelta: ");
+            strBuilder.Append (timerData.timeInTurn);
+            strBuilder.AppendLine ();
+        }
+        return strBuilder;
     }
 
     public NetworkPlayer netPlayer;
     public int localPlayerId;
     public PlayerActionType actionType;
-    public SlotTimerData timerData;
+    public TurnTimerData timerData;
 }
 
 public class InputController : MonoBehaviour
@@ -85,12 +115,15 @@ public class InputController : MonoBehaviour
 
         if (action.actionType != PlayerActionType.Undefined) {
 
-            action.timerData = SlotTimerScript.getTimerData ();
+            action.timerData = TurnTimer.getTimerData ();
 
-            Debug.Log ("SENT TO SERVER: " + DebugUtility.AppendPlayerActionString (new StringBuilder (), action).ToString ());
+            Debug.Log ("SENT TO SERVER: " + action.AppendActionString (new StringBuilder ()).ToString ());
 
-            networkView.RPC ("AddAction", RPCMode.AllBuffered, action.netPlayer, action.localPlayerId, 
-                             (int)action.actionType, action.timerData.slotSequenceNo, action.timerData.timeInSlot);
+            if (Network.isServer) {
+                SendMessage ("AddActionServerLocal", action, SendMessageOptions.RequireReceiver);
+            } else {
+                networkView.RPC ("AddAction", RPCMode.Server, action.netPlayer, action.localPlayerId, (int)action.actionType, action.timerData.turnNumber, action.timerData.timeInTurn);
+            }
         }
     }
 }
