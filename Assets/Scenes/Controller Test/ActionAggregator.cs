@@ -54,12 +54,12 @@ public class ActionAggregator : MonoBehaviour
 
     }
        
-    public void TurnOver (int turnNo)
+    public void TurnOver (TurnTimerData timerData)
     {
         IList<PlayerAction> turnActionList = new List<PlayerAction> ();
 
         foreach (PlayerAction pAction in actionList) {
-            if (pAction.timerData.turnNumber == turnNo) {
+            if (pAction.timerData.turnNumber == timerData.turnNumber) {
                 turnActionList.Add (pAction);
             }
         }
@@ -72,11 +72,11 @@ public class ActionAggregator : MonoBehaviour
     }
 
     [RPC]
-    public void AddAction (NetworkPlayer netPlayer, int localPlayerId, int actionType, int timeSlotNo, float deltaInSlot)
+    public void AddAction (NetworkPlayer netPlayer, int localPlayerId, int actionType, int turnNo, int moveNo, float deltaInSlot)
     {
-        PlayerAction action = new PlayerAction (netPlayer, localPlayerId, actionType, timeSlotNo, deltaInSlot);
+        PlayerAction action = new PlayerAction (netPlayer, localPlayerId, actionType, turnNo, moveNo, deltaInSlot);
 
-        Debug.Log ("RECEIVED BY SERVER: " + DebugUtility.AppendPlayerActionString (new StringBuilder (), action).ToString ());
+        Debug.Log ("RECEIVED: " + DebugUtility.AppendActionString (new StringBuilder (), action).ToString ());
 
         InsertAction (action);
     }
