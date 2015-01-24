@@ -175,7 +175,7 @@ public class GameManager : MonoBehaviour
             }
         case 1:
             {
-                singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "controllerTestScene", singleton.lastLevelPrefix + 1);
+                singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "characterScene", singleton.lastLevelPrefix + 1);
                 break;
             }
         case 2:
