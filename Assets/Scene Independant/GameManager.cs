@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     public const string GAME_NAME = "Marmalaka";
     public static GameManager singleton;
 
+    private int gameMode = -1;
+
     void Awake ()
     {
         if (singleton == null) {
@@ -17,6 +19,11 @@ public class GameManager : MonoBehaviour
         }
 
         DontDestroyOnLoad (gameObject);
+    }
+
+    public static void SetGameMode (int newMode)
+    {
+        singleton.gameMode = newMode;
     }
 
     public static void StartServer (int port)
@@ -34,7 +41,24 @@ public class GameManager : MonoBehaviour
     public static void StartGame ()
     {
 
-        singleton.networkView.RPC ("InvokeLevelLoad", RPCMode.AllBuffered, "controllerTestScene");
+        switch (singleton.gameMode) {
+        case 0:
+            {
+                singleton.networkView.RPC ("InvokeLevelLoad", RPCMode.AllBuffered, "controllerTestScene");
+                break;
+            }
+        case 1:
+            {
+                singleton.networkView.RPC ("InvokeLevelLoad", RPCMode.AllBuffered, "controllerTestScene");
+                break;
+            }
+        case 2:
+            {
+                singleton.networkView.RPC ("InvokeLevelLoad", RPCMode.AllBuffered, "SceneControllerTest");
+                break;
+            }
+        }
+
 
     }
 

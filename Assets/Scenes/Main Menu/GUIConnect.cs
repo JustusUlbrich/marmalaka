@@ -70,6 +70,8 @@ public class GUIConnect : MonoBehaviour
     {
         if (GUILayout.Button ("Start")) {
 
+            GameManager.SetGameMode (gameMode);
+
             int portNo = int.Parse (portString);
 
             if (serverMode) {
