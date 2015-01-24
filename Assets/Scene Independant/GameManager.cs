@@ -1,76 +1,77 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public class GameManager : MonoBehaviour
 {
-		public const string GAME_NAME = "Marmalaka";
-		public static GameManager singleton;
+    public const string GAME_NAME = "Marmalaka";
+    public static GameManager singleton;
 
-		void Awake ()
-		{
-				if (singleton == null) {
-						singleton = this;
-				} else {
-						Destroy (gameObject);
-						return;
-				}
+    void Awake ()
+    {
+        if (singleton == null) {
+            singleton = this;
+        } else {
+            Destroy (gameObject);
+            return;
+        }
 
-				DontDestroyOnLoad (gameObject);
-		}
+        DontDestroyOnLoad (gameObject);
+    }
 
-		public void StartServer (int port)
-		{
+    public static void StartServer (int port)
+    {
 
-				Network.InitializeServer (5, port, false);
+        Network.InitializeServer (5, port, false);
 
-				Application.LoadLevel ("SceneLobby");
+        Application.LoadLevel ("SceneLobby");
 
-				Debug.Log ("Loaded Lobby");
+        Debug.Log ("Loaded Lobby");
 
-		}
+    }
 
 
-		public void StartGame ()
-		{
+    public static void StartGame ()
+    {
 
-				networkView.RPC ("InvokeLevelLoad", RPCMode.AllBuffered, "SceneLevel");
+        singleton.networkView.RPC ("InvokeLevelLoad", RPCMode.AllBuffered, "controllerTestScene");
 
-		}
+    }
 
-		[RPC]
-		void InvokeLevelLoad (string sceneName)
-		{
-				Application.LoadLevel (sceneName);
-		}
+    [RPC]
+    void InvokeLevelLoad (string sceneName)
+    {
+        Application.LoadLevel (sceneName);
+    }
 
-		public void ConnectToHost (string ip, int port)
-		{
+    public static void ConnectToHost (string ip, int port)
+    {
 
-				Network.Connect (ip, port);
+        Network.Connect (ip, port);
 
-				Application.LoadLevel ("SceneConnecting");
+        Application.LoadLevel ("SceneConnecting");
 
-				Debug.Log ("Loaded Connecting");
+        Debug.Log ("Loaded Connecting");
 
-		}
+    }
 
-		void OnConnectedToServer ()
-		{
-				Application.LoadLevel ("SceneLobby");
-				Debug.Log ("Loaded Lobby");
-		}
+    void OnConnectedToServer ()
+    {
+        Application.LoadLevel ("SceneLobby");
+        Debug.Log ("Loaded Lobby");
+    }
 
-		void OnDisconnectedFromServer ()
-		{
-				if (Network.isClient) {
-						Debug.LogError ("Disconnected from Server.");
-				}
-				Application.LoadLevel ("SceneMainMenu");
-		}
+    void OnDisconnectedFromServer ()
+    {
+        if (Network.isClient) {
+            Debug.LogError ("Disconnected from Server.");
+        }
+        Application.LoadLevel ("SceneMainMenu");
+    }
 
-		void OnFailedToConnect (NetworkConnectionError error)
-		{
-				Debug.LogError ("Could not connect to server: " + error);
-				Application.LoadLevel ("SceneMainMenu");
-		}
+    void OnFailedToConnect (NetworkConnectionError error)
+    {
+        Debug.LogError ("Could not connect to server: " + error);
+        Application.LoadLevel ("SceneMainMenu");
+    }
 }

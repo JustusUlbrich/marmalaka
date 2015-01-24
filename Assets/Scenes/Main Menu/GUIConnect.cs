@@ -4,53 +4,81 @@ using System.Collections;
 public class GUIConnect : MonoBehaviour
 {
 
-		public string ip = "127.0.0.1";
-		public string portString = "4444";
+    private Rect modeWindowRect = new Rect (Screen.width / 2 - 75, Screen.height / 2 - 100, 150, 100);
+    private Rect netWindowRect = new Rect (Screen.width / 2 - 75, Screen.height / 2, 150, 100);
+    private Rect startWindowRec = new Rect (Screen.width / 2 - 75, Screen.height / 2 + 100, 150, 50);
 
-		void OnGUI ()
-		{
+    public string ip = "127.0.0.1";
+    public string portString = "4444";
 
-				GUILayout.BeginVertical ();
+    public int gameMode = 0;
+    private string[] gameModeStrings = {"Battle Arena", "Duck, Duck, Noob!", "Training Ground"};
 
-				GUILayout.Space (100);
+    public bool serverMode = false;
 
-				if (!Network.isServer && !Network.isClient) {
-						
-						GUILayout.Label (" ===   Server   === ");
-						if (GUILayout.Button ("Start Server")) {
-			
-								GameManager.singleton.StartServer (4444);
-						}
+    void OnGUI ()
+    {
 
-						
+        modeWindowRect = GUI.Window (0, modeWindowRect, DoGameModeWindow, "Game Mode");
+        netWindowRect = GUI.Window (1, netWindowRect, DoNetWindow, "Networking Mode");
+        startWindowRec = GUI.Window (2, startWindowRec, DoStartWindow, "Ready?");
+    }
 
-						GUILayout.Space (20);
+    public void DoGameModeWindow (int winId)
+    {
+        GUILayout.BeginVertical ();
 
-						GUILayout.Label (" ===   Client   === ");
+        for (int i = 0; i < 3; i ++) {
 
-						GUILayout.BeginHorizontal ();
+            if (gameMode == i) {
 
-						GUILayout.Label ("IP:");
-						ip = GUILayout.TextField (ip);
+                GUILayout.BeginHorizontal ();
+                GUILayout.FlexibleSpace ();
+                GUILayout.Label (gameModeStrings [i]);
+                GUILayout.FlexibleSpace ();
+                GUILayout.EndHorizontal ();
 
-						GUILayout.EndHorizontal ();
+            } else if (GUILayout.Button (gameModeStrings [i])) {
+                gameMode = i;
+            }
+        }
 
-						GUILayout.BeginHorizontal ();
+        GUILayout.EndVertical ();
+    }
 
-						portString = GUILayout.TextField (portString);
+    public void DoNetWindow (int winId)
+    {
+        GUILayout.BeginHorizontal ();
+        GUILayout.Label ("IP:");
+        ip = GUILayout.TextField (ip);
+        GUILayout.EndHorizontal ();
 
-						GUILayout.EndHorizontal ();
+        GUILayout.BeginHorizontal ();
+        GUILayout.Label ("PortNo:");
+        portString = GUILayout.TextField (portString);
+        GUILayout.EndHorizontal ();
 
-						if (GUILayout.Button ("Connect")) {
-								int port = int.Parse (portString);
+        GUILayout.BeginHorizontal ();
 
-								GameManager.singleton.ConnectToHost (ip, port);
-						}
+        serverMode = GUILayout.Toggle (serverMode, "Server");
+        serverMode = !GUILayout.Toggle (!serverMode, "Client");
 
-				}
+        GUILayout.EndHorizontal ();
+    }
 
-				GUILayout.EndVertical ();
-		}
+    public void DoStartWindow (int winId)
+    {
+        if (GUILayout.Button ("Start")) {
 
-		
+            int portNo = int.Parse (portString);
+
+            if (serverMode) {
+                GameManager.StartServer (portNo);
+            } else {
+                GameManager.ConnectToHost (ip, portNo);
+            }
+
+        }
+    }
+        
 }
