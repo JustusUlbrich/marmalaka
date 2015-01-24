@@ -2,35 +2,60 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum PlayerActionType {Forward, TurnLeft, TurnRight, TurnBack, Jump, Attack, None};
+public enum PlayerActionType { Forward, TurnLeft, TurnRight, TurnBack, Jump, Attack, Nop, Undefined };
 
 public class PlayerAction {
     public PlayerAction()
     {
-        timeInSlot = 0.0f;
-        actionType = PlayerActionType.None;
+        actionType = PlayerActionType.Undefined;
+        timerData = new SlotTimerData();
     }
 
-    protected float timeInSlot;
-    protected PlayerActionType actionType;
+    public PlayerActionType actionType;
+    public SlotTimerData timerData;
 }
 
 public class InputController : MonoBehaviour {
-    List<PlayerAction> actions;
-
-	// Use this for initialization
+  	// Use this for initialization
 	void Start () {
-        PlayerAction action = new PlayerAction();
 
-        actions.Add(action);
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
-	    
+        checkKeyboardInput();
+
 	}
 
     void checkKeyboardInput() {
-        Input.GetButtonDown("P1Forward");
+        PlayerAction action = new PlayerAction();
+
+        string playerString = "P1";
+
+        if (Input.GetButtonDown(playerString + "Forward"))
+            action.actionType = PlayerActionType.Forward;
+
+        else if (Input.GetButtonDown(playerString + "TurnLeft"))
+            action.actionType = PlayerActionType.TurnLeft;
+
+        else if (Input.GetButtonDown(playerString + "TurnRight"))
+            action.actionType = PlayerActionType.TurnRight;
+
+        else if (Input.GetButtonDown(playerString + "TurnBack"))
+            action.actionType = PlayerActionType.TurnBack;
+
+        else if (Input.GetButtonDown(playerString + "Jump"))
+            action.actionType = PlayerActionType.Jump;
+
+        else if (Input.GetButtonDown(playerString + "Attack"))
+            action.actionType = PlayerActionType.Attack;
+
+
+        if (action.actionType != PlayerActionType.Undefined)
+        {
+            action.timerData = SlotTimerScript.getTimerData();
+            //TODO Send action to network sever
+            Debug.Log("Player Action: Type " + action.actionType.ToString() + "  SlotNo" + action.timerData.slotSequenceNo + "  Time:" + action.timerData.timeInSlot);
+        }
     }
 }
