@@ -11,12 +11,11 @@ public class tickerControl : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        maxSlotTime = SlotTimerScript.singleton.maxSlotTime;
+        maxSlotTime = TurnTimer.singleton.moveTime * TurnTimer.singleton.numberOfMoves;
 
-        float timeInSlot  = SlotTimerScript.getTimerData().timeInSlot;
+        float timeInSlot = TurnTimer.getTimerData().timeInTurn;
         float angle = -360 * (timeInSlot / maxSlotTime);
 
         this.transform.localRotation = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1));
-        //this.transform.rotation = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1));
 	}
 }
