@@ -85,7 +85,7 @@ public class Character : MonoBehaviour
         //Check if we are on a street and next is also street. In such case walk two steps forward instead of only one.
         GameObject groundCellContent = GameManager.singleton.levelGen.floorGrid[((int) position.x)][((int)position.z)];
         if (groundCellContent != null) {
-			GameObject targetGroundCellContent = GameManager.singleton.levelGen.floorGrid[((int) position.x)][((int)position.z)];
+			GameObject targetGroundCellContent = GameManager.singleton.levelGen.floorGrid[((int) targetPos.x)][((int)targetPos.z)];
 			if (groundCellContent.CompareTag("street") && targetGroundCellContent.CompareTag("street")) {
 				targetPos += VIEWING_DIRECTIONS [viewingDirectionIndex];;
             }
