@@ -274,6 +274,9 @@ public class GameManager : MonoBehaviour
                 pData.character = newCharacter;
             }
 
+            SendMessage ("RealGameLoaded");
+            SendMessage ("StartGameObjectiveWatch");
+
         }
 
     }

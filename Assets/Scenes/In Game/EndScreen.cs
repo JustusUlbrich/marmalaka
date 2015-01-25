@@ -6,6 +6,7 @@ public class EndScreen : MonoBehaviour
 
 
     public float showDuration = 5.0f;
+    private float timeLeft;
 
     // 0 = back to main menu
     // 1 = new game 
@@ -15,12 +16,31 @@ public class EndScreen : MonoBehaviour
     private bool show = false;
     private float endTime;
     private int endCondition;
+    private int turnCount;
 
     public void SetActive (int endConditionParam)
     {
         endTime = Time.time;
         show = true;
         endCondition = endConditionParam;
+        timeLeft = showDuration;
+
+        TurnTimer.singleton.enabled = false;
+        turnCount = TurnTimer.getPlayTimerData ().turnNumber;
+
+        Network.Disconnect ();
+    }
+
+    public void Update ()
+    {
+        if (show) {
+            timeLeft -= Time.deltaTime;
+
+            if (timeLeft < 0) {
+                Destroy (gameObject);
+                Application.LoadLevel ("SceneMainMenu");
+            }
+        }
     }
 
     public void OnGUI ()
@@ -42,8 +62,8 @@ public class EndScreen : MonoBehaviour
             {
                 // Time UP
 
-                GUILayout.Label ("Time Over! You Lost!");
-
+                GUILayout.Label ("Time Over! You Lost! " + turnCount + " turns played!");
+                GUILayout.Label ("Going Back to Main Menu in " + timeLeft + " seconds!");
 
                 break;
             }
@@ -51,6 +71,7 @@ public class EndScreen : MonoBehaviour
             {
                 // Target reached
                 GUILayout.Label ("You reached the target in time!");
+                GUILayout.Label ("Going Back to Main Menu in " + timeLeft + " seconds!");
 
                 break;
             }
