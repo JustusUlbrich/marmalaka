@@ -6,13 +6,14 @@ public class Character : MonoBehaviour {
 	public GameObject characterGO;
 	public int viewingDirectionIndex;
 	public Vector3 viewingDirection;
-	public const static Vector3[] VIEWING_DIRECTIONS = new Array[] {new Vector3(1, 0, 0), 
-		new Vector3(0, 0, 1), 
-		new Vector3(-1, 0, 0), 
-		new Vector3(0, 0, -1)};
+	private Vector3[] VIEWING_DIRECTIONS;
 
 	// Use this for initialization
 	void Start () {
+		VIEWING_DIRECTIONS = new Vector3[] {new Vector3(1, 0, 0), 
+			new Vector3(0, 0, 1), 
+			new Vector3(-1, 0, 0), 
+			new Vector3(0, 0, -1)};
 		viewingDirectionIndex = 0;
 		viewingDirection = VIEWING_DIRECTIONS[0];
 	}
