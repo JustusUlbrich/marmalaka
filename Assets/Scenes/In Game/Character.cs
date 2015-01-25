@@ -98,7 +98,7 @@ public class Character : MonoBehaviour
 
 		if(isInLevel(targetPos)) {
         	targetCellObstacleContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), 0, ((int)targetPos.z)];
-			if(targetCellObstacleContent != null) {
+			if(targetCellObstacleContent != null && targetCellObstacleContent.tag != "target") {
 				Debug.Log ("Found Tag: " + targetCellObstacleContent.tag); 
 			} else {
 				fromPos = position;
