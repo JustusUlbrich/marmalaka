@@ -312,7 +312,7 @@ public class LevelGenerator : MonoBehaviour
                 {
                     currentPosition.y = k;
                     GameObject.DestroyObject(top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z]);
-                    top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z] = GameObject.Instantiate(topGO [0], currentPosition, Quaternion.identity) as GameObject;
+                    top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z] = GameObject.Instantiate(topGO [(int)(Random.value * topGO.Count)], currentPosition, Quaternion.identity) as GameObject;
                 }
             }
         }
