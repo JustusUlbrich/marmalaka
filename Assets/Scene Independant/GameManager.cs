@@ -70,6 +70,10 @@ public class GameManager : MonoBehaviour
         //MasterServer.RegisterHost ("Synchronarchy - Conjunction Dysfunction", "", "");
         if (loadLobby)
             LoadLobby ();
+        else {
+            SetGameMode (1);
+            StartGame ();
+        }
     }
 
     public static void LoadLobby ()
@@ -275,7 +279,9 @@ public class GameManager : MonoBehaviour
             Application.loadedLevelName.CompareTo ("controllerTestScene") == 0 ||
             Application.loadedLevelName.CompareTo ("GameTest") == 0) {
             Character newCharacter = Network.Instantiate (singleton.characterPrefab, Vector3.zero + Vector3.up * 1.0f, Quaternion.identity, 0) as Character;
-            
+
+            Destroy (gameObject.GetComponent<AudioListener> ());
+
             foreach (PlayerData pData in singleton.players) {
                 pData.character = newCharacter;
             }
@@ -292,7 +298,7 @@ public class GameManager : MonoBehaviour
         if (!Network.isServer)
             Debug.LogError ("NOT SERVER AND CHECKING WIN CONDITIONS!");
 
-        singleton.networkView.RPC ("ApplyEndOfGame", RPCMode.All, (int) endCondition);
+        singleton.networkView.RPC ("ApplyEndOfGame", RPCMode.All, (int)endCondition);
     }
 
     [RPC]

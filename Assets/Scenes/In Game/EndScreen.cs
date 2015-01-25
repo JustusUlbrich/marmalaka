@@ -8,11 +8,6 @@ public class EndScreen : MonoBehaviour
     public float showDuration = 5.0f;
     private float timeLeft;
 
-    // 0 = back to main menu
-    // 1 = new game 
-    // 2 = same players / lobby again
-    public int endGameSolution = 0;
-
     private bool show = false;
     private float endTime;
     private int endCondition;
