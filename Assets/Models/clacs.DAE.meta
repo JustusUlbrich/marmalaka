@@ -7,10 +7,12 @@ ModelImporter:
     100002: //RootNode
     100004: Cylinder001
     100006: FDirect001
+    100008: Clacs
     400000: Box001
     400002: //RootNode
     400004: Cylinder001
     400006: FDirect001
+    400008: Clacs
     2300000: Box001
     2300002: Cylinder001
     3300000: Box001
