@@ -4,17 +4,25 @@ using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour
 {
+    private const string GRASS = "grass";
+    private const string WATER = "water";
+    private const string STREET = "street";
+    private const string PATH = "path";
     public GameObject pathTile;
     public List<GameObject> floorGO;
     public List<GameObject> middleGO;
     public List<GameObject> topGO;
     public List<List<GameObject>> floorGrid;
+    public GameObject[,,] top3DGrid;
     public int levelSize;
     public int seed;
     public float distanceProbability;
     public float forwardProbability;
     public int maxNumberOfStreets;
     public int maxNumberOfWater;
+    public int maxNumberOfHills;
+    public int hillDensity;
+    public int maxHillHeight;
     public List<float> floorPropability;
     public List<float> middlePropability;
     public List<float> topPropability;
@@ -35,6 +43,7 @@ public class LevelGenerator : MonoBehaviour
         foreach (Vector2 tile in playerPath)
         {
             GameObject.Instantiate(pathTile, new Vector3(tile.x, 0, tile.y), Quaternion.identity);
+            floorGrid [(int)tile.x] [(int)tile.y].tag = PATH;
         }
     }
 
@@ -77,6 +86,9 @@ public class LevelGenerator : MonoBehaviour
 
         generateWater();
         drawWater();
+
+        top3DGrid = new GameObject[levelSize, maxHillHeight, levelSize];
+        generateHills();
     }
 
     int computeDirection(int numTiles)
@@ -152,7 +164,7 @@ public class LevelGenerator : MonoBehaviour
             {
                 path.Add(bottom);
             }
-            currentPosition = path[path.Count - 1];
+            currentPosition = path [path.Count - 1];
         }
 
         return path;
@@ -164,7 +176,7 @@ public class LevelGenerator : MonoBehaviour
         float sum = 0;
         for (int i = 0; i < probabilityList.Count; i++)
         {
-            sum += probabilityList[i];
+            sum += probabilityList [i];
             densityList.Add(sum);
         }
         return densityList;
@@ -172,18 +184,7 @@ public class LevelGenerator : MonoBehaviour
 
     void generateTiles()
     {
-
-        List<List<float>> objectDensities = new List<List<float>>();
         floorPropability = computeDensity(floorPropability);
-//        objectDensities.Add(computeDensity(middlePropability));
-//        objectDensities.Add(computeDensity(topPropability));
-//
-//        objectTypes.Add(middle);
-//        objectTypes.Add(top);
-//        levelGrid3d = new List<List<List<GameObject>>>();
-//
-//        List<GameObject> currentObjects = new List<GameObject>();
-//        List<float> curDensity = new List<float>();
 
         Random.Range(0f, 1f);
         for (int x = 0; x < this.levelSize; x++)
@@ -227,6 +228,93 @@ public class LevelGenerator : MonoBehaviour
             Vector2 start = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
             Vector2 end = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
             waterPaths.Add(computePathBetweenPoints(start, end));
+        }
+    }
+
+    bool validatePosition(Vector3 currentPosition)
+    {
+        return currentPosition.x >= 0 && currentPosition.x < levelSize 
+            && currentPosition.z >= 0 && currentPosition.z < levelSize 
+            && floorGrid [(int)currentPosition.x] [(int)currentPosition.z].tag == GRASS;
+    }
+
+    void placeHillTile(Vector3 position, Vector3 currentPosition, int iteration)
+    {
+        if (validatePosition(currentPosition))
+        {
+            for (int k = 1; k <= Random.value * position.y * Mathf.Pow(0.8f, iteration) + 1; k++)
+            {
+                currentPosition.y = k;
+                GameObject.DestroyObject(top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z]);
+                top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z] = GameObject.Instantiate(topGO [0], currentPosition, Quaternion.identity) as GameObject;
+            }
+        }
+    }
+
+    void computeHill(Vector3 position)
+    {
+        if (floorGrid [(int)position.x] [(int)position.z].tag.Equals(GRASS))
+        {
+            for (int i = 0; i < (int)position.y; i++)
+            {
+                top3DGrid [(int)position.x, i, (int)position.z] = GameObject.Instantiate(topGO [0], new Vector3(position.x, i + 1, position.z), Quaternion.identity) as GameObject;
+            }
+
+            Vector3 topRight = position;
+            Vector3 bottomLeft = position;
+
+            if (position.y == 1)
+            {
+                GameObject.DestroyObject(top3DGrid [(int)position.x, (int)position.y - 1, (int)position.z]);
+                top3DGrid [(int)position.x, (int)position.y - 1, (int)position.z] = GameObject.Instantiate(topGO [0], position, Quaternion.identity) as GameObject;
+            } else
+            {
+                for (int y = 0; y < hillDensity; y++)
+                {
+                    topRight.x += 1;
+                    topRight.z += 1;
+                    bottomLeft.x -= 1;
+                    bottomLeft.z -= 1;
+                   
+                    for (int i = (int)bottomLeft.x; i <= topRight.x; i++)
+                    {
+                        Vector3 currentPosition = new Vector3(i, 0, (int)bottomLeft.z);
+                        placeHillTile(position, currentPosition, y);
+                    }
+                    
+                    for (int i = (int)bottomLeft.z + 1; i <= topRight.z; i++)
+                    {
+                        Vector3 currentPosition = new Vector3((int)topRight.x, 0, i);
+                        placeHillTile(position, currentPosition, y);
+                    }
+                    
+                    for (int i = (int)topRight.x - 1; i >=  bottomLeft.x; i--)
+                    {
+                        Vector3 currentPosition = new Vector3(i, 0, topRight.z);
+                        placeHillTile(position, currentPosition, y);
+                    }
+                    
+                    for (int i = (int)topRight.z - 1; i >= bottomLeft.z + 1; i--)
+                    {
+                        Vector3 currentPosition = new Vector3((int)bottomLeft.x, 0, i);
+                        placeHillTile(position, currentPosition, y);
+                    }
+                }
+                
+                
+            }
+        }
+    }
+
+    void generateHills()
+    {
+        int numberOfHills = (int)(maxNumberOfHills * Random.value);
+        for (int i = 0; i < numberOfHills; i++)
+        {
+            Vector3 position = new Vector3((int)((levelSize - 1) * Random.value),
+                                           (int)((maxHillHeight) * Random.value) + 1,
+                                           (int)((levelSize - 1) * Random.value));
+            computeHill(position);
         }
     }
 
