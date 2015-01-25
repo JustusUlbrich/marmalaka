@@ -60,7 +60,7 @@ public class GUIActionDebug : MonoBehaviour
         StringBuilder actionString = new StringBuilder ();
 
         foreach (PlayerAction pAction in actionList) {
-            pAction.AppendActionString (actionString, true);
+            DebugUtility.AppendActionString (actionString, pAction, true);
         }
 
         return actionString.ToString ();
