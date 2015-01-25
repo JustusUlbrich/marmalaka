@@ -16,6 +16,7 @@ public class LevelGenerator : MonoBehaviour
     public List<GameObject> topGO;
     public GameObject house;
     public List<List<GameObject>> floorGrid;
+    public GameObject targetGO; 
     public GameObject[,,] top3DGrid;
     public int levelSize;
     public int seed;
@@ -289,7 +290,8 @@ public class LevelGenerator : MonoBehaviour
     void computePathForPlayer()
     {
         //compute diagonal path
-        playerPath = computePathBetweenPoints(p1Start, target); 
+        playerPath = computePathBetweenPoints(p1Start, target);
+        top3DGrid[(int)target.x, 0, (int)target.y] = GameObject.Instantiate(targetGO, new Vector3(target.x, 1,target.y), Quaternion.identity) as GameObject;
     }
 
     List<Vector2> computePathBetweenPoints(Vector2 start, Vector2 target)
