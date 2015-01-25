@@ -58,11 +58,12 @@ public class TurnTimer : MonoBehaviour
         turnTime = numberOfMoves * moveTime;
         timeInMove = 0.0f;
 
-        SendMessage ("InputMoveStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
         SendMessage ("InputTurnStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+        SendMessage ("InputMoveStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
 
-        SendMessage ("PlayMoveStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
         SendMessage ("PlayTurnStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
+        SendMessage ("PlayMoveStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
+
 
     }
 	
@@ -81,6 +82,8 @@ public class TurnTimer : MonoBehaviour
 
             timeInMove -= moveTime;
             moveOver = true;
+
+            Debug.Log ("Move Overat " + TurnTimer.getPlayTimerData ().timeInTurn);
 
         }
 
@@ -106,7 +109,11 @@ public class TurnTimer : MonoBehaviour
             playTimerData.turnNumber++;
             playTimerData.moveNumber = 0;
 
+            SendMessage ("InputTurnStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
             SendMessage ("InputMoveStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+
+
+            SendMessage ("PlayTurnStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
             SendMessage ("PlayMoveStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
 
 

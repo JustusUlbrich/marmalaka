@@ -8,29 +8,34 @@ public class LevelGenerator : MonoBehaviour
     private const string WATER = "water";
     private const string STREET = "street";
     private const string PATH = "path";
+    private const string HOUSE = "house";
     public GameObject pathTile;
     public List<GameObject> floorGO;
     public List<GameObject> middleGO;
     public List<GameObject> topGO;
+    public GameObject house;
     public List<List<GameObject>> floorGrid;
     public GameObject[,,] top3DGrid;
     public int levelSize;
     public int seed;
     public float distanceProbability;
     public float forwardProbability;
+    public List<float> floorprobability;
+    public List<float> middleprobability;
+    public List<float> topprobability;
+    public float houseprobability;
     public int maxNumberOfStreets;
     public int maxNumberOfWater;
     public int maxNumberOfHills;
     public int hillDensity;
     public int maxHillHeight;
-    public List<float> floorPropability;
-    public List<float> middlePropability;
-    public List<float> topPropability;
     private List<Vector2> playerPath;
     private List<List<Vector2>> streetPaths;
     private List<List<Vector2>> waterPaths;
     private Vector2 p1Start;
     private Vector2 target;
+    public GameObject player1Charmonix;
+
 
     // Use this for initialization
     void Start()
@@ -77,6 +82,10 @@ public class LevelGenerator : MonoBehaviour
         target.Set(levelSize - 1, levelSize - 1);//Random.value * levelSize, Random.value * levelSize);
         Random.seed = seed;
         floorGrid = new List<List<GameObject>>();
+        top3DGrid = new GameObject[levelSize, maxHillHeight, levelSize];
+        top3DGrid.Initialize();
+
+
         computePathForPlayer();
         generateTiles();
         clearPath();
@@ -87,8 +96,11 @@ public class LevelGenerator : MonoBehaviour
         generateWater();
         drawWater();
 
-        top3DGrid = new GameObject[levelSize, maxHillHeight, levelSize];
+        generateHouses();
+
         generateHills();
+
+        GameObject.Instantiate(player1Charmonix, new Vector3(p1Start.x, 1, p1Start.y), Quaternion.identity);
     }
 
     int computeDirection(int numTiles)
@@ -184,7 +196,7 @@ public class LevelGenerator : MonoBehaviour
 
     void generateTiles()
     {
-        floorPropability = computeDensity(floorPropability);
+        floorprobability = computeDensity(floorprobability);
 
         Random.Range(0f, 1f);
         for (int x = 0; x < this.levelSize; x++)
@@ -193,9 +205,9 @@ public class LevelGenerator : MonoBehaviour
             for (int z = 0; z < this.levelSize; z++)
             {
                 float randomValue = Random.value;
-                for (int i = 0; i < floorPropability.Count; i++)
+                for (int i = 0; i < floorprobability.Count; i++)
                 {
-                    if (randomValue < floorPropability [i])
+                    if (randomValue < floorprobability [i])
                     {
                         floorGrid [x].Add(GameObject.Instantiate(floorGO [i], new Vector3(x, 0, z), Quaternion.identity) as GameObject);
                         break;
@@ -217,6 +229,58 @@ public class LevelGenerator : MonoBehaviour
             Vector2 end = new Vector2((int)((levelSize - 1) * Random.value), (int)((levelSize - 1) * Random.value));
             streetPaths.Add(computePathBetweenPoints(start, end));
         }
+    }
+
+    void generateHouses() {
+        foreach (List<Vector2> path in streetPaths)
+        {
+            foreach (Vector2 position in path) {
+                createHouse(new Vector3(position.x, Random.value*maxHillHeight*0.5f, position.y));
+            }
+        }
+    }
+
+    Vector2 getDirection(Vector2 position)
+    {
+        Vector2 direction = new Vector2(0,0);
+
+            float randomDirection = Random.value;
+            if (randomDirection < 0.5) {
+                direction = new Vector2(1,0);
+            } else 
+            {
+                direction = new Vector2(-1,0);
+            }
+            Vector3 currentPosition = new Vector3(position.x + direction.x, 0, position.y + direction.y);
+            if (validatePosition(currentPosition)) {
+                return direction;
+            } else
+            {
+                float dirX = direction.x;
+                direction.x = 0;
+                direction.y = dirX;
+                currentPosition = new Vector3(position.x + direction.x, 0, position.y + direction.y);
+                if(validatePosition(currentPosition))
+                {
+                    return direction;
+                }
+            } 
+        return new Vector2(0, 0);
+    }
+
+    void createHouse(Vector3 position) {
+        float randomValue = Random.value;
+        if (randomValue < houseprobability) {
+            Vector2 direction = getDirection(new Vector2(position.x, position.z));
+            if(Vector2.SqrMagnitude(direction) > 0)
+            {
+                for(int i = 0; i < position.y; i++)
+                {
+                    top3DGrid[(int)(position.x + direction.x), i, (int)(position.z + direction.y)] = GameObject.Instantiate(house, new Vector3(position.x + direction.x, i + 1, position.z + direction.y), Quaternion.identity) as GameObject;
+                }
+            }
+        }
+
     }
 
     void generateWater()
@@ -242,18 +306,25 @@ public class LevelGenerator : MonoBehaviour
     {
         if (validatePosition(currentPosition))
         {
-            for (int k = 1; k <= Random.value * position.y * Mathf.Pow(0.8f, iteration) + 1; k++)
-            {
-                currentPosition.y = k;
-                GameObject.DestroyObject(top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z]);
-                top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z] = GameObject.Instantiate(topGO [0], currentPosition, Quaternion.identity) as GameObject;
+            if (top3DGrid [(int)currentPosition.x, 0, (int)currentPosition.z] == null) {
+    
+                for (int k = 1; k <= Random.value * position.y * Mathf.Pow(0.8f, iteration) + 1; k++)
+                {
+                    currentPosition.y = k;
+                    GameObject.DestroyObject(top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z]);
+                    top3DGrid [(int)currentPosition.x, (int)currentPosition.y - 1, (int)currentPosition.z] = GameObject.Instantiate(topGO [0], currentPosition, Quaternion.identity) as GameObject;
+                }
             }
         }
     }
 
     void computeHill(Vector3 position)
     {
-        if (floorGrid [(int)position.x] [(int)position.z].tag.Equals(GRASS))
+        if (top3DGrid[(int)position.x, 0, (int)position.z] != null)
+        {
+            return;
+        }
+        if (validatePosition(position))
         {
             for (int i = 0; i < (int)position.y; i++)
             {
@@ -265,8 +336,9 @@ public class LevelGenerator : MonoBehaviour
 
             if (position.y == 1)
             {
-                GameObject.DestroyObject(top3DGrid [(int)position.x, (int)position.y - 1, (int)position.z]);
-                top3DGrid [(int)position.x, (int)position.y - 1, (int)position.z] = GameObject.Instantiate(topGO [0], position, Quaternion.identity) as GameObject;
+                return;
+//                GameObject.DestroyObject(top3DGrid [(int)position.x, (int)position.y - 1, (int)position.z]);
+//                top3DGrid [(int)position.x, (int)position.y - 1, (int)position.z] = GameObject.Instantiate(topGO [0], position, Quaternion.identity) as GameObject;
             } else
             {
                 for (int y = 0; y < hillDensity; y++)

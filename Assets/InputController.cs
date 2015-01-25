@@ -47,9 +47,12 @@ public class PlayerAction
 
 public class InputController : MonoBehaviour
 {
+    public int remainingMoveAllowance;
+
     // Use this for initialization
     void Start ()
     {
+        remainingMoveAllowance = GameManager.singleton.MOVE_ALLOWANCE;
 
     }
 	
@@ -61,6 +64,11 @@ public class InputController : MonoBehaviour
         for (int playerID = 0; playerID < localPlayerCount; ++playerID)
             checkKeyboardInput (playerID);
 
+    }
+
+    void InputTurnStart (TurnTimerData timerData)
+    {
+        remainingMoveAllowance = GameManager.singleton.MOVE_ALLOWANCE;
     }
 
     void checkKeyboardInput (int playerID)
@@ -84,8 +92,9 @@ public class InputController : MonoBehaviour
         else if (Input.GetButtonDown (playerString + "Attack"))
             action.actionType = PlayerActionType.Attack;
 
-        if (action.actionType != PlayerActionType.Undefined) {
+        if (action.actionType != PlayerActionType.Undefined && remainingMoveAllowance > 0) {
 
+            remainingMoveAllowance --;
             action.timerData = TurnTimer.getInputTimerData ();
 
             networkView.RPC ("AddAction", RPCMode.All, action.netPlayer, action.localPlayerId, (int)action.actionType, action.timerData.turnNumber, action.timerData.moveNumber, action.timerData.timeInTurn);

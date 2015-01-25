@@ -94,7 +94,8 @@ public class ActionAggregator : MonoBehaviour
     {
         turnToQueue = new TurnTimerData (timerData);
 
-        //QueueActions ();
+        QueueActions ();
+
         StartCoroutine (DelayedQueueActions ());
     }
 
