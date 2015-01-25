@@ -1,24 +1,13 @@
 fileFormatVersion: 2
-guid: e449aaedd27d53746b7779f94110d8b0
+guid: 10be82aedf039114d9f6e6f77b77d9ad
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
-    100000: Box001
-    100002: //RootNode
-    100004: Cylinder001
-    100006: FDirect001
-    100008: Clacs
-    400000: Box001
-    400002: //RootNode
-    400004: Cylinder001
-    400006: FDirect001
-    400008: Clacs
-    2300000: Box001
-    2300002: Cylinder001
-    3300000: Box001
-    3300002: Cylinder001
-    4300000: Cylinder001
-    4300002: Box001
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: Box047
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -39,7 +28,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: .00999999978
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1
