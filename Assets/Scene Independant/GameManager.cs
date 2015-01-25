@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
         singleton.gameMode = newMode;
     }
 
-    public static void StartServer (int port)
+    public static void StartServer (int port, bool loadLobby)
     {
 
         Network.InitializeServer (5, port, false);
@@ -68,8 +68,14 @@ public class GameManager : MonoBehaviour
         }
 
         //MasterServer.RegisterHost ("Synchronarchy - Conjunction Dysfunction", "", "");
+        if (loadLobby)
+            LoadLobby ();
+    }
 
+    public static void LoadLobby ()
+    {
         singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "SceneLobby", singleton.lastLevelPrefix + 1);
+
     }
 
     public void OnPlayerConnected (NetworkPlayer player)

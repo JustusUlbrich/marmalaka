@@ -6,7 +6,7 @@ using System.Text;
 public class GUINetworkState : MonoBehaviour
 {
 
-    private bool showStatus = true;
+    private bool showStatus = false;
 
     public GUINetworkState singleton;
 
@@ -30,7 +30,7 @@ public class GUINetworkState : MonoBehaviour
 
     public void Update ()
     {
-        if (Input.GetKey ("2")) {
+        if (Input.GetKeyDown ("2")) {
             showStatus = !showStatus;
         }
     }
@@ -43,19 +43,20 @@ public class GUINetworkState : MonoBehaviour
         if (showStatus) {
 
             GUI.Label (new Rect (15, Screen.height - 25, Screen.width, 20), GameStatusText () + " | " + Application.loadedLevelName);
+        
+
+
+            GUILayout.BeginArea (new Rect (20, 20, 120, 600));
+            GUILayout.BeginVertical ();
+            GUILayout.BeginHorizontal ();
+            GUILayout.FlexibleSpace ();
+            GUILayout.Label ("Player List");
+            GUILayout.FlexibleSpace ();
+            GUILayout.EndHorizontal ();
+            GUILayout.TextArea (PopulatePlayerListString ());
+            GUILayout.EndVertical ();
+            GUILayout.EndArea ();
         }
-
-
-        GUILayout.BeginArea (new Rect (20, 20, 120, 600));
-        GUILayout.BeginVertical ();
-        GUILayout.BeginHorizontal ();
-        GUILayout.FlexibleSpace ();
-        GUILayout.Label ("Player List");
-        GUILayout.FlexibleSpace ();
-        GUILayout.EndHorizontal ();
-        GUILayout.TextArea (PopulatePlayerListString ());
-        GUILayout.EndVertical ();
-        GUILayout.EndArea ();
 
     }
 

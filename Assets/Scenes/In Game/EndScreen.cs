@@ -46,7 +46,7 @@ public class EndScreen : MonoBehaviour
     public void OnGUI ()
     {
         if (show)
-            GUI.ModalWindow (0, new Rect (Screen.width / 2 - 100, Screen.height / 2 - 40, 200, 80), DoEndGameWindow, "Game Over!");
+            GUI.ModalWindow (0, new Rect (Screen.width / 2 - 100, Screen.height / 2 - 50, 200, 100), DoEndGameWindow, "Game Over!");
     }
 
     public void DoEndGameWindow (int windowId)

@@ -75,7 +75,7 @@ public class GUIConnect : MonoBehaviour
             int portNo = int.Parse (portString);
 
             if (serverMode) {
-                GameManager.StartServer (portNo);
+                GameManager.StartServer (portNo, true);
             } else {
                 GameManager.ConnectToHost (ip, portNo);
             }
