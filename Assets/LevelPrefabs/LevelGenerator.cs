@@ -129,7 +129,7 @@ public class LevelGenerator : MonoBehaviour
     void placeRockObject(int x, int y, int z)
     {
         if(inBounds(x, y + 1, z) && futureTiles[x, y + 1, z] != null && futureTiles[x, y + 1, z] == ROCK) {
-            top3DGrid [x, y, z] = GameObject.Instantiate(topGO[4], 
+            top3DGrid [x, y-1, z] = GameObject.Instantiate(topGO[4], 
                                                          new Vector3(x, y, z), Quaternion.Euler(-90,0,0)) as GameObject;
 
         } else {
@@ -161,23 +161,23 @@ public class LevelGenerator : MonoBehaviour
             int angle = getAngle(right, left, top, bottom, rockCount);
             switch (rockCount) {
                 case 0:
-                    top3DGrid [x, y, z] = GameObject.Instantiate(topGO[0], 
+                    top3DGrid [x, y-1, z] = GameObject.Instantiate(topGO[0], 
                                                                  new Vector3(x, y, z), Quaternion.Euler(-90,angle,0)) as GameObject;
                     break;
                 case 1:
-                    top3DGrid [x, y, z] = GameObject.Instantiate(topGO[1], 
+                    top3DGrid [x, y-1, z] = GameObject.Instantiate(topGO[1], 
                                                                  new Vector3(x, y, z), Quaternion.Euler(-90,angle,0)) as GameObject;
                     break;
                 case 2:
-                    top3DGrid [x, y, z] = GameObject.Instantiate(topGO[2], 
+                    top3DGrid [x, y-1, z] = GameObject.Instantiate(topGO[2], 
                                                                  new Vector3(x, y, z), Quaternion.Euler(-90,angle,0)) as GameObject;
                     break;
                 case 3:
-                    top3DGrid [x, y, z] = GameObject.Instantiate(topGO[3], 
+                    top3DGrid [x, y-1, z] = GameObject.Instantiate(topGO[3], 
                                                                  new Vector3(x, y, z), Quaternion.Euler(-90,angle,0)) as GameObject;
                     break;
                 case 4:
-                    top3DGrid [x, y, z] = GameObject.Instantiate(topGO[4], 
+                    top3DGrid [x, y-1, z] = GameObject.Instantiate(topGO[4], 
                                                                  new Vector3(x, y, z), Quaternion.Euler(-90,angle,0)) as GameObject;
                     break;
                 default:

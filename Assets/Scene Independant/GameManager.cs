@@ -268,7 +268,7 @@ public class GameManager : MonoBehaviour
         if (Application.loadedLevelName.CompareTo ("characterScene") == 0 ||
             Application.loadedLevelName.CompareTo ("controllerTestScene") == 0 ||
             Application.loadedLevelName.CompareTo ("GameTest") == 0) {
-            Character newCharacter = Network.Instantiate (singleton.characterPrefab, Vector3.zero + Vector3.up * 0.5f, Quaternion.identity, 0) as Character;
+            Character newCharacter = Network.Instantiate (singleton.characterPrefab, Vector3.zero + Vector3.up * 1.0f, Quaternion.identity, 0) as Character;
             
             foreach (PlayerData pData in singleton.players) {
                 pData.character = newCharacter;
