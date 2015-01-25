@@ -7,6 +7,8 @@ public class ActionExecuter : MonoBehaviour
 {
     public static ActionExecuter singleton;
 
+    public Transform[] audioPrefabs;
+
     public IList<PlayerAction> turnMoves;
 
     public void Awake ()
@@ -57,6 +59,8 @@ public class ActionExecuter : MonoBehaviour
                     Debug.LogError ("CHARACTER REFERENCE NULL");
                 } else {
                     pData.character.SendMessage ("doAction", currentAction, SendMessageOptions.RequireReceiver);
+
+                    Instantiate (audioPrefabs [(int)currentAction.actionType], pData.character.transform.position, Quaternion.identity);
 
                     ActionHistory.AppendToHistory (currentAction);
                 }
