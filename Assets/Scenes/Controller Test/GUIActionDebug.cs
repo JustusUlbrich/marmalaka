@@ -8,7 +8,7 @@ public class GUIActionDebug : MonoBehaviour
 
     private Rect plannedArea = new Rect (160, 20, 200, 400);
     private Rect playingArea = new Rect (380, 20, 200, 400);
-    private Rect historyArea = new Rect (500, 20, 200, 400);
+    private Rect historyArea = new Rect (600, 20, 200, 400);
 
 
     Vector2 plannedScrollPos = Vector2.zero;
@@ -19,8 +19,12 @@ public class GUIActionDebug : MonoBehaviour
     public void OnGUI ()
     {
 
-        IList<PlayerAction> actionList = ActionAggregator.GetActionList ();
+        DrawActionList (plannedArea, "Planned", ref plannedScrollPos, ActionAggregator.GetActionList ());
+        DrawActionList (playingArea, "Queued", ref playingScrollPos, ActionExecuter.GetPlayingActionList ());
+        DrawActionList (historyArea, "Played", ref historyScrollPos, ActionHistory.GetHistory ());
 
+
+        /*
         GUILayout.BeginArea (plannedArea);
         GUILayout.BeginVertical ();
         GUILayout.BeginHorizontal ();
@@ -28,11 +32,9 @@ public class GUIActionDebug : MonoBehaviour
         GUILayout.Label ("Planned Actions");
         GUILayout.FlexibleSpace ();
         GUILayout.EndHorizontal ();
-
         plannedScrollPos = GUILayout.BeginScrollView (plannedScrollPos);
         GUILayout.TextArea (BuildPlannedActionListString (actionList));
         GUILayout.EndScrollView ();
-
         GUILayout.EndVertical ();
         GUILayout.EndArea ();
 
@@ -43,15 +45,33 @@ public class GUIActionDebug : MonoBehaviour
         GUILayout.Label ("Playing Actions");
         GUILayout.FlexibleSpace ();
         GUILayout.EndHorizontal ();
-
         playingScrollPos = GUILayout.BeginScrollView (playingScrollPos);
-       
         IList<PlayerAction> playingActionList = ActionExecuter.GetPlayingActionList ();
 
         GUILayout.TextArea (BuildPlannedActionListString (playingActionList));
         GUILayout.EndScrollView ();
 
         
+        GUILayout.EndVertical ();
+        GUILayout.EndArea ();*/
+
+    }
+
+    public void DrawActionList (Rect area, string title, ref Vector2 scrollBarState, IList<PlayerAction> actionList)
+    {
+
+        GUILayout.BeginArea (area);
+        GUILayout.BeginVertical ();
+        GUILayout.BeginHorizontal ();
+        GUILayout.FlexibleSpace ();
+
+        GUILayout.Label (title);
+
+        GUILayout.FlexibleSpace ();
+        GUILayout.EndHorizontal ();
+        scrollBarState = GUILayout.BeginScrollView (scrollBarState);
+        GUILayout.TextArea (BuildPlannedActionListString (actionList));
+        GUILayout.EndScrollView ();
         GUILayout.EndVertical ();
         GUILayout.EndArea ();
 

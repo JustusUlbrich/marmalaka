@@ -67,7 +67,7 @@ public class TurnTimer : MonoBehaviour
     }
 	
     // Update is called once per frame
-    void Update ()
+    void LateUpdate ()
     {
         inputTimerData.timeInTurn += Time.deltaTime;
         playTimerData.timeInTurn = inputTimerData.timeInTurn;

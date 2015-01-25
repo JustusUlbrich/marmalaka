@@ -37,19 +37,17 @@ public class ActionExecuter : MonoBehaviour
 
         foreach (PlayerAction pAction in turnMoves) {
 
-            if (pAction.timerData.turnNumber != timerData.turnNumber) {
-                Debug.LogError ("ERROR TURN NO IN LIST AND METHOD CALL DO NOT MATCH!");
+            if (pAction.timerData.turnNumber - timerData.turnNumber > 1) {
+                Debug.LogError ("ERROR TURN NO IN LIST AND METHOD CALL MORE THAN 1 APART!");
             }
 
             if (pAction.timerData.moveNumber == timerData.moveNumber) {
 
-                executedActions.Add (pAction);
-
-                Debug.Log ("Executed Action: " + DebugUtility.BuildActionString (pAction));
-
-
                 // TODO Get Character Object from GameManager and SendMessage on it
                 Instantiate (ActionVisualizerEffectShitRemoveMeWhenItsDone, new Vector3 (timerData.turnNumber * 5, 0, timerData.moveNumber * 5), Quaternion.identity);
+
+                executedActions.Add (pAction);
+                ActionHistory.AppendToHistory (pAction);
 
             }
         }
@@ -63,14 +61,18 @@ public class ActionExecuter : MonoBehaviour
     
     public static void QueueActions (IList<PlayerAction> newTurnActions)
     {
-        if (singleton.turnMoves.Count != 0) {
+        /*if (singleton.turnMoves.Count != 0) {
             Debug.LogError ("ACTION QUEUE NOT EMPTY ON NEW MOVE!");
 
             foreach (PlayerAction pAction in singleton.turnMoves)
                 Debug.LogError ("NEVER EXECUTED: " + DebugUtility.AppendActionString (new StringBuilder (), pAction).ToString ());
+        }*/
+
+        foreach (PlayerAction pAction in newTurnActions) {
+            singleton.turnMoves.Add (pAction);
+
         }
 
-        singleton.turnMoves = newTurnActions;
 
     }
 
