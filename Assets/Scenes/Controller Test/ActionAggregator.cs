@@ -53,14 +53,13 @@ public class ActionAggregator : MonoBehaviour
         }
 
     }
-
-    public void TurnOver (int turnNo)
+       
+    public void TurnOver (TurnTimerData timerData)
     {
-
         IList<PlayerAction> turnActionList = new List<PlayerAction> ();
 
         foreach (PlayerAction pAction in actionList) {
-            if (pAction.timerData.turnNumber == turnNo) {
+            if (pAction.timerData.turnNumber == timerData.turnNumber) {
                 turnActionList.Add (pAction);
             }
         }
@@ -73,31 +72,13 @@ public class ActionAggregator : MonoBehaviour
     }
 
     [RPC]
-    public void AddAction (NetworkPlayer netPlayer, int localPlayerId, int actionType, int timeSlotNo, float deltaInSlot)
+    public void AddAction (NetworkPlayer netPlayer, int localPlayerId, int actionType, int turnNo, int moveNo, float deltaInSlot)
     {
+        PlayerAction action = new PlayerAction (netPlayer, localPlayerId, actionType, turnNo, moveNo, deltaInSlot);
 
-        if (!Network.isServer) {
-            Debug.LogError ("Server function called on Client!!");
-        }
-
-        PlayerAction action = new PlayerAction (netPlayer, localPlayerId, actionType, timeSlotNo, deltaInSlot);
-
-        Debug.Log ("RECEIVED BY SERVER: " + action.AppendActionString (new StringBuilder ()).ToString ());
+        Debug.Log ("RECEIVED: " + DebugUtility.AppendActionString (new StringBuilder (), action).ToString ());
 
         InsertAction (action);
-    }
-
-    public void AddActionServerLocal (PlayerAction action)
-    {
-        
-        if (!Network.isServer) {
-            Debug.LogError ("Server function called on Client!!");
-        }
-        
-        Debug.Log ("RECEIVED BY SERVER: " + action.AppendActionString (new StringBuilder ()).ToString ());
-        
-        InsertAction (action);
-
     }
     
 }
