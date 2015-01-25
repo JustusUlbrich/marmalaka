@@ -78,8 +78,9 @@ public class Character : MonoBehaviour
         Vector3 position = getPosition ();
         fromPos = position;
 
+
         //position += VIEWING_DIRECTIONS [viewingDirectionIndex];
-        Vector3 targetPos = position + VIEWING_DIRECTIONS [viewingDirectionIndex];
+        Vector3 targetPos = toPos + VIEWING_DIRECTIONS [viewingDirectionIndex];
 
         GameObject targetCellContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), 0, ((int)targetPos.z)];
 
@@ -88,6 +89,7 @@ public class Character : MonoBehaviour
 
         } else {
             //transform.position = position;
+            fromPos = position;
             toPos = targetPos;
             startTime = Time.time;
         }
