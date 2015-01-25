@@ -32,6 +32,10 @@ public class GameManager : MonoBehaviour
 
     public IList<PlayerData> players;
 
+    public Character characterPrefab;
+
+    public int MOVE_ALLOWANCE = 4;
+
     void Awake ()
     {
         if (singleton == null) {
@@ -164,6 +168,18 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public static PlayerData GetPlayerData (NetworkPlayer netPlayer, int localPlayer)
+    {
+        foreach (PlayerData pData in singleton.players) {
+            if (pData.networkPlayer == netPlayer && pData.localPlayerId == localPlayer) {
+                return pData;
+            }
+        }
+
+        Debug.LogError ("GOT ACTION WITH NO MATCHING PLAYER DATA");
+        return null;
+    }
+
     public static void StartGame ()
     {
 
@@ -171,6 +187,7 @@ public class GameManager : MonoBehaviour
         case 0:
             {
                 singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "controllerTestScene", singleton.lastLevelPrefix + 1);
+
                 break;
             }
         case 1:
@@ -240,5 +257,16 @@ public class GameManager : MonoBehaviour
         //networkView.RPC ("LoadLevel", RPCMode.AllBuffered, level, lastLevelPrefix + 1);
         Destroy (gameObject);
         Application.LoadLevel ("SceneMainMenu");
+    }
+
+    public void OnLevelWasLoaded (int levelIndex)
+    {
+        if (Application.loadedLevelName.CompareTo ("characterScene") == 0) {
+            Character newCharacter = Network.Instantiate (singleton.characterPrefab, Vector3.zero, Quaternion.identity, 0) as Character;
+            
+            foreach (PlayerData pData in singleton.players) {
+                pData.character = newCharacter;
+            }
+        }
     }
 }

@@ -9,9 +9,6 @@ public class ActionExecuter : MonoBehaviour
 
     public IList<PlayerAction> turnMoves;
 
-    // TODO No Need for this shyte
-    public Transform ActionVisualizerEffectShitRemoveMeWhenItsDone;
-
     public void Awake ()
     {
         if (singleton == null) {
@@ -24,16 +21,50 @@ public class ActionExecuter : MonoBehaviour
 
     }
 
-    public void TurnOver (TurnTimerData timerData)
+    public void PlayTurnStart (TurnTimerData timerData)
     {
-        // First move has to be called here, to trigger move to start at beginning of move slot
-        // TODO RENAME MoveOver TO MoveStart
-        //MoveOver (timerData);
+        
     }
+
+    public void PlayTurnOver (TurnTimerData timerData)
+    {
+        for (int i = turnMoves.Count-1; i >= 0; i --) {
+            if (turnMoves [i].timerData.turnNumber <= timerData.turnNumber)
+                turnMoves.RemoveAt (i);
+        }
+    }
+
+
 
     public void PlayMoveStart (TurnTimerData timerData)
     {
-        IList<PlayerAction> executedActions = new List<PlayerAction> ();
+
+        if (turnMoves.Count > 0) {
+            PlayerAction currentAction = turnMoves [0];
+
+            if (currentAction.timerData.turnNumber < timerData.turnNumber) {
+                turnMoves.RemoveAt (0);
+                PlayMoveStart (timerData);
+            } else if (currentAction.timerData.turnNumber > timerData.turnNumber) {
+                // Only from next turn, do no ting
+            } else {
+                // Execute!
+                turnMoves.RemoveAt (0);
+
+                PlayerData pData = GameManager.GetPlayerData (currentAction.netPlayer, currentAction.localPlayerId);
+                
+                if (pData.character == null) {
+                    Debug.LogError ("CHARACTER REFERENCE NULL");
+                } else {
+                    pData.character.SendMessage ("doAction", currentAction, SendMessageOptions.RequireReceiver);
+
+                    ActionHistory.AppendToHistory (currentAction);
+                }
+            }
+
+        }
+
+        /*IList<PlayerAction> executedActions = new List<PlayerAction> ();
 
         foreach (PlayerAction pAction in turnMoves) {
 
@@ -41,20 +72,26 @@ public class ActionExecuter : MonoBehaviour
                 Debug.LogError ("ERROR TURN NO IN LIST AND METHOD CALL MORE THAN 1 APART!");
             }
 
-            if (pAction.timerData.moveNumber == timerData.moveNumber) {
+            if (pAction.timerData.turnNumber == timerData.turnNumber) {
 
-                // TODO Get Character Object from GameManager and SendMessage on it
-                Instantiate (ActionVisualizerEffectShitRemoveMeWhenItsDone, new Vector3 (timerData.turnNumber * 5, 0, timerData.moveNumber * 5), Quaternion.identity);
 
-                executedActions.Add (pAction);
-                ActionHistory.AppendToHistory (pAction);
+                PlayerData pData = GameManager.GetPlayerData (pAction.netPlayer, pAction.localPlayerId);
+
+                if (pData.character == null)
+                    Debug.LogError ("CHARACTER REFERENCE NULL");
+                else {
+                    pData.character.SendMessage ("doAction", pAction, SendMessageOptions.RequireReceiver);
+
+                    executedActions.Add (pAction);
+                    ActionHistory.AppendToHistory (pAction);
+                }
 
             }
         }
         
         foreach (PlayerAction pAction in executedActions) {
             turnMoves.Remove (pAction);
-        }
+        }*/
 
 
     }
