@@ -82,7 +82,6 @@ public class Character : MonoBehaviour
         Vector3 position = getPosition ();
         fromPos = position;
 
-
         //position += VIEWING_DIRECTIONS [viewingDirectionIndex];
         Vector3 targetPos = toPos + VIEWING_DIRECTIONS [viewingDirectionIndex];
 
@@ -102,58 +101,47 @@ public class Character : MonoBehaviour
 
     private void clearPostionTransition()
     {
-        fromPos = toPos = transform.position;
+        fromPos = toPos;
+        transform.position = toPos;
     }
 
     private void clearRotationTransition()
     {
-        fromRot = toRot = transform.rotation;
+        fromRot = toRot;
+        transform.rotation = toRot;
     }
 
     private void turnLeft ()
     {
-        Vector3 position = getPosition ();
-        int prevDirectionIndex = viewingDirectionIndex;
         viewingDirectionIndex ++;
         if (viewingDirectionIndex >= VIEWING_DIRECTIONS.Length) {
             viewingDirectionIndex = 0;
         }
-        position += VIEWING_DIRECTIONS [viewingDirectionIndex];
 
         startTime = Time.time;
         fromRot = transform.rotation;
         toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
-        //transform.LookAt (position);
     }
 
     private void turnRight ()
     {
-        Vector3 position = getPosition ();
         viewingDirectionIndex --;
         if (viewingDirectionIndex < 0) {
             viewingDirectionIndex = VIEWING_DIRECTIONS.Length - 1;
         }
-        position += VIEWING_DIRECTIONS [viewingDirectionIndex];
 
         startTime = Time.time;
         fromRot = transform.rotation;
         toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
-        //transform.LookAt (position);
     }
 
     private void turnBack ()
     {
-        Vector3 position = getPosition ();
-        viewingDirection.x *= -1;
-        viewingDirection.y *= -1;
-        position += VIEWING_DIRECTIONS [viewingDirectionIndex];
-
         viewingDirectionIndex = (viewingDirectionIndex + 2) % 4;
 
         startTime = Time.time;
         fromRot = transform.rotation;
         toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
-        //transform.LookAt (position);
     }
 
     //Jump up and down and move it all around *lalala
