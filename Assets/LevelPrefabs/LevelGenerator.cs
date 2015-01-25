@@ -50,7 +50,7 @@ public class LevelGenerator : MonoBehaviour
     {
         foreach (Vector2 tile in playerPath)
         {
-            GameObject.Instantiate(pathTile, new Vector3(tile.x, 0, tile.y), Quaternion.identity);
+//            GameObject.Instantiate(pathTile, new Vector3(tile.x, 0, tile.y), Quaternion.identity);
             floorGrid [(int)tile.x] [(int)tile.y].tag = PATH;
         }
     }
