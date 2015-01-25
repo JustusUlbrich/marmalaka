@@ -84,11 +84,14 @@ public class Character : MonoBehaviour
 
         //Check if we are on a street and next is also street. In such case walk two steps forward instead of only one.
         GameObject groundCellContent = GameManager.singleton.levelGen.floorGrid[((int) position.x)][((int)position.z)];
-        if (groundCellContent != null) {
+        if (isInLevel(targetPos) && groundCellContent != null) {
 			GameObject targetGroundCellContent = GameManager.singleton.levelGen.floorGrid[((int) targetPos.x)][((int)targetPos.z)];
 			if (groundCellContent.CompareTag("street") && targetGroundCellContent.CompareTag("street")) {
-				targetPos += VIEWING_DIRECTIONS [viewingDirectionIndex];;
-            }
+				Vector3 tempTargetPos = targetPos + VIEWING_DIRECTIONS [viewingDirectionIndex];
+            	if(isInLevel(tempTargetPos)) {
+					targetPos = tempTargetPos;
+				}
+			}
         }
 		
 		GameObject targetCellObstacleContent = null;
@@ -103,11 +106,21 @@ public class Character : MonoBehaviour
 				startTime = Time.time;
 			}
 		}
+		if(reachedTarget(targetPos)) {
+			GameManager.EndGameConditionMet(EndCondition.TargetReached);
+		}
+	}
+
+	private bool reachedTarget(Vector3 position) {
+		Vector2 target = GameManager.singleton.levelGen.target;
+		int targetX = (int) target.x;
+		int targetY = (int) target.y;
+		return position.x == targetX && position.z == targetY;
 	}
 
 	private bool isInLevel(Vector3 position) {
 		int levelSize = GameManager.singleton.levelGen.levelSize;
-		return (position.x < levelSize) && (position.x < levelSize) && (position.x >= 0) && (position.y >= 0);
+		return (position.x < levelSize) && (position.z < levelSize) && (position.x >= 0) && (position.z >= 0);
 	}
 
     private void clearPostionTransition()

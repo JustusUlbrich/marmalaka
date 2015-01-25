@@ -281,12 +281,12 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public static void EndGameConditionMet (int endCondition)
+    public static void EndGameConditionMet (EndCondition endCondition)
     {
         if (!Network.isServer)
             Debug.LogError ("NOT SERVER AND CHECKING WIN CONDITIONS!");
 
-        singleton.networkView.RPC ("ApplyEndOfGame", RPCMode.All, endCondition);
+        singleton.networkView.RPC ("ApplyEndOfGame", RPCMode.All, (int) endCondition);
     }
 
     [RPC]
