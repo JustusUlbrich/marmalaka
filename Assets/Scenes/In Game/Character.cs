@@ -15,7 +15,7 @@ public class Character : MonoBehaviour
 			new Vector3 (0, 0, 1), 
 			new Vector3 (-1, 0, 0), 
 			new Vector3 (0, 0, -1)};
-        viewingDirectionIndex = 0;
+        viewingDirectionIndex = 1;
         viewingDirection = VIEWING_DIRECTIONS [0];
     }
 	

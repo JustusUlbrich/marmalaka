@@ -267,6 +267,11 @@ public class GameManager : MonoBehaviour
             foreach (PlayerData pData in singleton.players) {
                 pData.character = newCharacter;
             }
+
         }
+
+
+
+
     }
 }
