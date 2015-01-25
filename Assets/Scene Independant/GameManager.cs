@@ -22,7 +22,7 @@ public class PlayerData
 
 public class GameManager : MonoBehaviour
 {
-    public const string GAME_NAME = "Marmalaka";
+    public const string GAME_NAME = "Synchronarchy - Conjunction Dysfunction";
     public static GameManager singleton;
 
     private int gameMode = -1;
@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
     public Character characterPrefab;
 
     public int MOVE_ALLOWANCE = 4;
+
+    public LevelGenerator levelGen;
 
     void Awake ()
     {
@@ -64,6 +66,8 @@ public class GameManager : MonoBehaviour
             PlayerData newP = new PlayerData (Network.player, i);
             singleton.players.Add (newP);
         }
+
+        //MasterServer.RegisterHost ("Synchronarchy - Conjunction Dysfunction", "", "");
 
         singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "SceneLobby", singleton.lastLevelPrefix + 1);
     }
@@ -192,7 +196,7 @@ public class GameManager : MonoBehaviour
             }
         case 1:
             {
-                singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "characterScene", singleton.lastLevelPrefix + 1);
+                singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "GameTest", singleton.lastLevelPrefix + 1);
                 break;
             }
         case 2:
@@ -261,8 +265,10 @@ public class GameManager : MonoBehaviour
 
     public void OnLevelWasLoaded (int levelIndex)
     {
-        if (Application.loadedLevelName.CompareTo ("characterScene") == 0) {
-            Character newCharacter = Network.Instantiate (singleton.characterPrefab, Vector3.zero, Quaternion.identity, 0) as Character;
+        if (Application.loadedLevelName.CompareTo ("characterScene") == 0 ||
+            Application.loadedLevelName.CompareTo ("controllerTestScene") == 0 ||
+            Application.loadedLevelName.CompareTo ("GameTest") == 0) {
+            Character newCharacter = Network.Instantiate (singleton.characterPrefab, Vector3.zero + Vector3.up * 0.5f, Quaternion.identity, 0) as Character;
             
             foreach (PlayerData pData in singleton.players) {
                 pData.character = newCharacter;

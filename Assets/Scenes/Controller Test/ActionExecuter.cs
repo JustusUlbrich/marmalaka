@@ -64,35 +64,6 @@ public class ActionExecuter : MonoBehaviour
 
         }
 
-        /*IList<PlayerAction> executedActions = new List<PlayerAction> ();
-
-        foreach (PlayerAction pAction in turnMoves) {
-
-            if (pAction.timerData.turnNumber - timerData.turnNumber > 1) {
-                Debug.LogError ("ERROR TURN NO IN LIST AND METHOD CALL MORE THAN 1 APART!");
-            }
-
-            if (pAction.timerData.turnNumber == timerData.turnNumber) {
-
-
-                PlayerData pData = GameManager.GetPlayerData (pAction.netPlayer, pAction.localPlayerId);
-
-                if (pData.character == null)
-                    Debug.LogError ("CHARACTER REFERENCE NULL");
-                else {
-                    pData.character.SendMessage ("doAction", pAction, SendMessageOptions.RequireReceiver);
-
-                    executedActions.Add (pAction);
-                    ActionHistory.AppendToHistory (pAction);
-                }
-
-            }
-        }
-        
-        foreach (PlayerAction pAction in executedActions) {
-            turnMoves.Remove (pAction);
-        }*/
-
 
     }
     

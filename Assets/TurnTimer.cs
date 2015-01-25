@@ -83,8 +83,6 @@ public class TurnTimer : MonoBehaviour
             timeInMove -= moveTime;
             moveOver = true;
 
-            Debug.Log ("Move Overat " + TurnTimer.getPlayTimerData ().timeInTurn);
-
         }
 
         if (inputTimerData.timeInTurn >= turnTime) {

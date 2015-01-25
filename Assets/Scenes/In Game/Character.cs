@@ -8,6 +8,13 @@ public class Character : MonoBehaviour
     public Vector3 viewingDirection;
     private Vector3[] VIEWING_DIRECTIONS;
 
+    private float startTime;
+    private Vector3 fromPos;
+    private Vector3 toPos;
+
+    private Quaternion fromRot;
+    private Quaternion toRot;
+
     // Use this for initialization
     void Start ()
     {
@@ -17,18 +24,21 @@ public class Character : MonoBehaviour
 			new Vector3 (0, 0, -1)};
         viewingDirectionIndex = 1;
         viewingDirection = VIEWING_DIRECTIONS [0];
+
+        fromRot = Quaternion.identity;
+        toRot = Quaternion.identity;
     }
 	
     // Update is called once per frame
     void Update ()
     {
-	
+        float timeFactor = (Time.time - startTime) / TurnTimer.singleton.moveTime;
+
+        transform.position = Vector3.Lerp (fromPos, toPos, timeFactor);
     }
 
     public void doAction (PlayerAction action)
     {
-        Debug.Log ("Hexecuted Action at " + TurnTimer.getPlayTimerData ().timeInTurn);
-
         switch (action.actionType) {
         case PlayerActionType.Forward:
             {
@@ -66,13 +76,28 @@ public class Character : MonoBehaviour
     private void moveForward ()
     {
         Vector3 position = getPosition ();
-        position += VIEWING_DIRECTIONS [viewingDirectionIndex];
-        transform.position = position;
+        fromPos = position;
+
+        //position += VIEWING_DIRECTIONS [viewingDirectionIndex];
+        Vector3 targetPos = position + VIEWING_DIRECTIONS [viewingDirectionIndex];
+
+        GameObject targetCellContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), 0, ((int)targetPos.z)];
+
+        if (targetCellContent != null) {
+            Debug.Log ("Found Tag: " + targetCellContent.tag);
+
+        } else {
+            //transform.position = position;
+            toPos = targetPos;
+            startTime = Time.time;
+        }
+
     }
 
     private void turnLeft ()
     {
         Vector3 position = getPosition ();
+        int prevDirectionIndex = viewingDirectionIndex;
         viewingDirectionIndex ++;
         if (viewingDirectionIndex >= VIEWING_DIRECTIONS.Length) {
             viewingDirectionIndex = 0;
