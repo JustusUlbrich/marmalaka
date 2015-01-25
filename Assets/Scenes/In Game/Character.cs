@@ -79,11 +79,19 @@ public class Character : MonoBehaviour
 
     private void moveForward ()
     {
-        Vector3 position = getPosition ();
-        fromPos = position;
+        Vector3 position = getPosition();
 
-        //position += VIEWING_DIRECTIONS [viewingDirectionIndex];
-        Vector3 targetPos = toPos + VIEWING_DIRECTIONS [viewingDirectionIndex];
+        ////Check if we are on a street and next is also street
+        //GameObject groundCellContent = GameManager.singleton.levelGen.floorGrid[((int) toPos.x)][((int)toPos.z)];
+        //if (groundCellContent != null)
+        //{
+        //    if (groundCellContent.CompareTag("street"))
+        //    {
+
+        //    }
+        //}
+
+        Vector3 targetPos = position + VIEWING_DIRECTIONS [viewingDirectionIndex];
 
         GameObject targetCellContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), 0, ((int)targetPos.z)];
 
@@ -152,7 +160,23 @@ public class Character : MonoBehaviour
 
     private void attack ()
     {
-        //TODO
+        Vector3 targetPos = toPos + VIEWING_DIRECTIONS[viewingDirectionIndex];
+
+        GameObject targetCellContent = GameManager.singleton.levelGen.top3DGrid[((int)targetPos.x), ((int)targetPos.y), ((int)targetPos.z)];
+
+        int currentHeight = (int)targetPos.y;
+        while (targetCellContent != null && targetCellContent.CompareTag("house"))
+        {
+            GameObject.Destroy(targetCellContent);
+
+            currentHeight++;
+            if (currentHeight < GameManager.singleton.levelGen.maxHillHeight)
+                targetCellContent = GameManager.singleton.levelGen.top3DGrid[((int)targetPos.x), currentHeight, ((int)targetPos.z)];
+            else
+                targetCellContent = null;
+        }
+
+        
     }
 
     private Vector3 getPosition ()
