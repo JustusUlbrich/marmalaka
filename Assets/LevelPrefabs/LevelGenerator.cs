@@ -35,7 +35,6 @@ public class LevelGenerator : MonoBehaviour
     private List<List<Vector2>> waterPaths;
     private Vector2 p1Start;
     private Vector2 target;
-    public GameObject player1Charmonix;
 
     private string[,,] futureTiles;
 
@@ -44,6 +43,7 @@ public class LevelGenerator : MonoBehaviour
     void Start()
     {
         setupLevel();
+        GameManager.singleton.levelGen = this;
     }
 
     void clearPath()
