@@ -6,11 +6,14 @@ using System.Text;
 public class GUIActionDebug : MonoBehaviour
 {
 
-    private Rect plannedArea = new Rect (160, 20, 250, 400);
-    private Rect playingArea = new Rect (430, 20, 250, 400);
+    private Rect plannedArea = new Rect (160, 20, 200, 400);
+    private Rect playingArea = new Rect (380, 20, 200, 400);
+    private Rect historyArea = new Rect (500, 20, 200, 400);
+
 
     Vector2 plannedScrollPos = Vector2.zero;
     Vector2 playingScrollPos = Vector2.zero;
+    Vector2 historyScrollPos = Vector2.zero;
 
     
     public void OnGUI ()

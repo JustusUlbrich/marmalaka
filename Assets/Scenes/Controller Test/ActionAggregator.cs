@@ -54,7 +54,7 @@ public class ActionAggregator : MonoBehaviour
 
     }
        
-    public void TurnOver (TurnTimerData timerData)
+    public void InputTurnOver (TurnTimerData timerData)
     {
         IList<PlayerAction> turnActionList = new List<PlayerAction> ();
 

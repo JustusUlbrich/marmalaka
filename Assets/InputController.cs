@@ -86,11 +86,9 @@ public class InputController : MonoBehaviour
 
         if (action.actionType != PlayerActionType.Undefined) {
 
-            action.timerData = TurnTimer.getTimerData ();
+            action.timerData = TurnTimer.getInputTimerData ();
 
-            //Debug.Log ("SENT: " + DebugUtility.AppendActionString (new StringBuilder (), action).ToString ());
-
-            networkView.RPC ("AddAction", RPCMode.AllBuffered, action.netPlayer, action.localPlayerId, (int)action.actionType, action.timerData.turnNumber, action.timerData.moveNumber, action.timerData.timeInTurn);
+            networkView.RPC ("AddAction", RPCMode.All, action.netPlayer, action.localPlayerId, (int)action.actionType, action.timerData.turnNumber, action.timerData.moveNumber, action.timerData.timeInTurn);
         }
     }
 }

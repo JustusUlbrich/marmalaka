@@ -10,9 +10,14 @@ public class PlayerData
         localPlayerId = localPlayerIdParam;
     }
 
+    public void SetCharacter (Character characterParam)
+    {
+        character = characterParam;
+    }
+
     public NetworkPlayer networkPlayer;
     public int localPlayerId;
-
+    public Character character = null;
 }
 
 public class GameManager : MonoBehaviour
@@ -53,14 +58,10 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < singleton.localPlayerCount; i ++) {
             PlayerData newP = new PlayerData (Network.player, i);
-            //newPlayers.Add (newP);
             singleton.players.Add (newP);
         }
 
         singleton.networkView.RPC ("LoadLevel", RPCMode.AllBuffered, "SceneLobby", singleton.lastLevelPrefix + 1);
-
-        Debug.Log ("Loaded Lobby");
-
     }
 
     public void OnPlayerConnected (NetworkPlayer player)
@@ -73,18 +74,12 @@ public class GameManager : MonoBehaviour
         if (!Network.isServer)
             Debug.LogError ("Received Server Message as Client!!");
 
-        //SendPlayerList (msgInfo.sender);
-
-        //IList<PlayerData> newPlayers = new List<PlayerData> ();
-
         for (int i = 0; i < newClientPlayerCount; i ++) {
             PlayerData newP = new PlayerData (msgInfo.sender, i);
-            //newPlayers.Add (newP);
             players.Add (newP);
         }
 
 
-        //SendPlayerList (newPlayers);
 
         SendFullPlayerList ();
 
@@ -98,6 +93,8 @@ public class GameManager : MonoBehaviour
         // Send local client info to server
         // // local player count
         networkView.RPC ("NewClient", RPCMode.Server, localPlayerCount);
+        //networkView.RPC ("NewClient", RPCMode.AllBuffered, localPlayerCount);
+
     }
 
     [RPC]
@@ -108,6 +105,8 @@ public class GameManager : MonoBehaviour
 
     public void SendFullPlayerList ()
     {
+        // TODO: DO NOT DELETE; CHECK FOR DUPLICATES!
+
         networkView.RPC ("DoDeletePlayerList", RPCMode.Others);
 
         foreach (PlayerData pData in players) {
@@ -141,7 +140,7 @@ public class GameManager : MonoBehaviour
 
     public void OnPlayerDisconnected (NetworkPlayer netPlayer)
     {
-
+        Network.RemoveRPCs (netPlayer);
         networkView.RPC ("RemovePlayer", RPCMode.All, netPlayer);
 
 

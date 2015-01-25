@@ -16,7 +16,7 @@ public class TurnTimerData
         moveNumber = other.moveNumber;
     }
 
-    public TurnTimerData (int turnNoParam, float turnTimeParam, int moveNumberParam)
+    public TurnTimerData (int turnNoParam, int moveNumberParam, float turnTimeParam)
     { 
         turnNumber = turnNoParam;
         timeInTurn = turnTimeParam;
@@ -30,7 +30,8 @@ public class TurnTimerData
 
 public class TurnTimer : MonoBehaviour
 {
-    private TurnTimerData timerData;
+    private TurnTimerData inputTimerData;
+    private TurnTimerData playTimerData;
 
     //TODO move me into settings and keep it private
     private float turnTime;
@@ -48,62 +49,94 @@ public class TurnTimer : MonoBehaviour
             Destroy (gameObject);
         }
 
-        timerData = new TurnTimerData ();
+        inputTimerData = new TurnTimerData ();
+        playTimerData = new TurnTimerData (-1, 0, 0.0f);
     }
 
-    // Use this for initialization
     void Start ()
     {
-        timerData = new TurnTimerData ();
         turnTime = numberOfMoves * moveTime;
         timeInMove = 0.0f;
 
-        SendMessage ("MoveStart", new TurnTimerData (singleton.timerData), SendMessageOptions.DontRequireReceiver);
+        SendMessage ("InputMoveStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+        SendMessage ("InputTurnStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+
+        SendMessage ("PlayMoveStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
+        SendMessage ("PlayTurnStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
 
     }
 	
     // Update is called once per frame
     void Update ()
     {
-        timerData.timeInTurn += Time.deltaTime;
+        inputTimerData.timeInTurn += Time.deltaTime;
+        playTimerData.timeInTurn = inputTimerData.timeInTurn;
+
         timeInMove += Time.deltaTime;
 
         bool moveOver = false;
         bool turnOver = false;
 
         if (timeInMove >= moveTime) {
+
             timeInMove -= moveTime;
             moveOver = true;
+
         }
 
-        if (timerData.timeInTurn >= turnTime) {
-            timerData.timeInTurn -= turnTime;
+        if (inputTimerData.timeInTurn >= turnTime) {
+
+            inputTimerData.timeInTurn -= turnTime;
+            playTimerData.timeInTurn = inputTimerData.timeInTurn;
             turnOver = true;
+
         }
 
         if (turnOver) {
-            SendMessage ("MoveOver", new TurnTimerData (singleton.timerData), SendMessageOptions.DontRequireReceiver);
-            SendMessage ("TurnOver", new TurnTimerData (singleton.timerData), SendMessageOptions.DontRequireReceiver);
 
-            timerData.turnNumber++;
-            timerData.moveNumber = 0;
+            SendMessage ("InputMoveOver", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+            SendMessage ("InputTurnOver", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
 
-            SendMessage ("MoveStart", new TurnTimerData (singleton.timerData), SendMessageOptions.DontRequireReceiver);
+            SendMessage ("PlayMoveOver", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
+            SendMessage ("PlayTurnOver", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
+
+            inputTimerData.turnNumber++;
+            inputTimerData.moveNumber = 0;
+
+            playTimerData.turnNumber++;
+            playTimerData.moveNumber = 0;
+
+            SendMessage ("InputMoveStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+            SendMessage ("PlayMoveStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
+
+
+
         } else if (moveOver) {
-            SendMessage ("MoveOver", new TurnTimerData (singleton.timerData), SendMessageOptions.DontRequireReceiver);
 
-            timerData.moveNumber ++;
+            SendMessage ("InputMoveOver", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+            SendMessage ("PlayMoveOver", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
 
-            SendMessage ("MoveStart", new TurnTimerData (singleton.timerData), SendMessageOptions.DontRequireReceiver);
+            inputTimerData.moveNumber++;
+            playTimerData.moveNumber++;
+
+            SendMessage ("InputMoveStart", new TurnTimerData (singleton.inputTimerData), SendMessageOptions.DontRequireReceiver);
+            SendMessage ("PlayMoveStart", new TurnTimerData (singleton.playTimerData), SendMessageOptions.DontRequireReceiver);
 
         }
             
     }
 
-    public static TurnTimerData getTimerData ()
+    //public static TurnTimerData getTimerData ()
+    //{
+    //    return new TurnTimerData (singleton.timerData);
+    //}
+    public static TurnTimerData getInputTimerData ()
     {
-        return new TurnTimerData (singleton.timerData);
+        return new TurnTimerData (singleton.inputTimerData);
     }
 
-
+    public static TurnTimerData getPlayTimerData ()
+    {
+        return new TurnTimerData (singleton.playTimerData);
+    }
 }

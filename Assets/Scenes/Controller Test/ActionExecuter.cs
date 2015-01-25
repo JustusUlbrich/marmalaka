@@ -31,13 +31,13 @@ public class ActionExecuter : MonoBehaviour
         //MoveOver (timerData);
     }
 
-    public void MoveStart (TurnTimerData timerData)
+    public void PlayMoveStart (TurnTimerData timerData)
     {
         IList<PlayerAction> executedActions = new List<PlayerAction> ();
 
         foreach (PlayerAction pAction in turnMoves) {
 
-            if (pAction.timerData.turnNumber != timerData.turnNumber - 1) {
+            if (pAction.timerData.turnNumber != timerData.turnNumber) {
                 Debug.LogError ("ERROR TURN NO IN LIST AND METHOD CALL DO NOT MATCH!");
             }
 
@@ -53,9 +53,7 @@ public class ActionExecuter : MonoBehaviour
 
             }
         }
-
-        //Debug.Log ("Executed Turn: " + timerData.turnNumber + " | " + timerData.moveNumber + " with " + executedActions.Count + " Actions!");
-
+        
         foreach (PlayerAction pAction in executedActions) {
             turnMoves.Remove (pAction);
         }
