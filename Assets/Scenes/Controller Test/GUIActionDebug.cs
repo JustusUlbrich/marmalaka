@@ -15,9 +15,31 @@ public class GUIActionDebug : MonoBehaviour
     Vector2 playingScrollPos = Vector2.zero;
     Vector2 historyScrollPos = Vector2.zero;
 
+    public static GUIActionDebug singleton;
+    public bool showGUI = false;
+
+    public void Awake ()
+    {
+        if (singleton == null)
+            singleton = this;
+        else
+            Destroy (this);
+
+        showGUI = false;
+    }
+
+    public void Update ()
+    {
+        if (Input.GetKey ("1")) {
+            showGUI = !showGUI;
+        }
+    }
+
     
     public void OnGUI ()
     {
+        if (!showGUI)
+            return;
 
         DrawActionList (plannedArea, "Planned", ref plannedScrollPos, ActionAggregator.GetActionList ());
         DrawActionList (playingArea, "Queued", ref playingScrollPos, ActionExecuter.GetPlayingActionList ());

@@ -274,10 +274,26 @@ public class GameManager : MonoBehaviour
                 pData.character = newCharacter;
             }
 
+            SendMessage ("RealGameLoaded");
+            SendMessage ("StartGameObjectiveWatch");
+
         }
 
+    }
 
+    public static void EndGameConditionMet (int endCondition)
+    {
+        if (!Network.isServer)
+            Debug.LogError ("NOT SERVER AND CHECKING WIN CONDITIONS!");
 
+        singleton.networkView.RPC ("ApplyEndOfGame", RPCMode.All, endCondition);
+    }
 
+    [RPC]
+    public void ApplyEndOfGame (int endCondition)
+    {
+        EndScreen endScreen = GetComponent<EndScreen> ();
+
+        endScreen.SetActive (endCondition);
     }
 }

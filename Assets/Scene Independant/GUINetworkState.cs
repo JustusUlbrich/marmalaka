@@ -8,9 +8,31 @@ public class GUINetworkState : MonoBehaviour
 
     private bool showStatus = true;
 
+    public GUINetworkState singleton;
+
     void Awake ()
     {
+
+        if (singleton == null) {
+            singleton = this;
+        } else {
+            Destroy (this);
+        }
+
         DontDestroyOnLoad (gameObject);
+    }
+
+    public void Start ()
+    {
+        if (GameManager.singleton != null)
+            transform.parent = GameManager.singleton.transform;
+    }
+
+    public void Update ()
+    {
+        if (Input.GetKey ("2")) {
+            showStatus = !showStatus;
+        }
     }
 
     void OnGUI ()
