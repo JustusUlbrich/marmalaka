@@ -76,7 +76,7 @@ public class ActionAggregator : MonoBehaviour
     {
         PlayerAction action = new PlayerAction (netPlayer, localPlayerId, actionType, turnNo, moveNo, deltaInSlot);
 
-        Debug.Log ("RECEIVED: " + DebugUtility.AppendActionString (new StringBuilder (), action).ToString ());
+        //Debug.Log ("RECEIVED: " + DebugUtility.AppendActionString (new StringBuilder (), action).ToString ());
 
         InsertAction (action);
     }

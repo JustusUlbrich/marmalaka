@@ -88,7 +88,7 @@ public class InputController : MonoBehaviour
 
             action.timerData = TurnTimer.getTimerData ();
 
-            Debug.Log ("SENT: " + DebugUtility.AppendActionString (new StringBuilder (), action).ToString ());
+            //Debug.Log ("SENT: " + DebugUtility.AppendActionString (new StringBuilder (), action).ToString ());
 
             networkView.RPC ("AddAction", RPCMode.AllBuffered, action.netPlayer, action.localPlayerId, (int)action.actionType, action.timerData.turnNumber, action.timerData.moveNumber, action.timerData.timeInTurn);
         }

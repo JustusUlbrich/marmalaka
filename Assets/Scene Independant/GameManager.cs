@@ -12,6 +12,7 @@ public class PlayerData
 
     public NetworkPlayer networkPlayer;
     public int localPlayerId;
+
 }
 
 public class GameManager : MonoBehaviour

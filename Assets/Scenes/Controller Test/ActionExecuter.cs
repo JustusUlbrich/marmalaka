@@ -45,13 +45,16 @@ public class ActionExecuter : MonoBehaviour
 
                 executedActions.Add (pAction);
 
+                Debug.Log ("Executed Action: " + DebugUtility.BuildActionString (pAction));
+
+
                 // TODO Get Character Object from GameManager and SendMessage on it
                 Instantiate (ActionVisualizerEffectShitRemoveMeWhenItsDone, new Vector3 (timerData.turnNumber * 5, 0, timerData.moveNumber * 5), Quaternion.identity);
 
             }
         }
 
-        Debug.Log ("Executed Turn: " + timerData.turnNumber + " | " + timerData.moveNumber + " with " + executedActions.Count + " Actions!");
+        //Debug.Log ("Executed Turn: " + timerData.turnNumber + " | " + timerData.moveNumber + " with " + executedActions.Count + " Actions!");
 
         foreach (PlayerAction pAction in executedActions) {
             turnMoves.Remove (pAction);
