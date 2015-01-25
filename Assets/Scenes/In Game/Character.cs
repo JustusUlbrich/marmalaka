@@ -35,10 +35,14 @@ public class Character : MonoBehaviour
         float timeFactor = (Time.time - startTime) / TurnTimer.singleton.moveTime;
 
         transform.position = Vector3.Lerp (fromPos, toPos, timeFactor);
+        transform.rotation = Quaternion.Slerp(fromRot, toRot, timeFactor);
     }
 
     public void doAction (PlayerAction action)
     {
+        clearPostionTransition();
+        clearRotationTransition();
+
         switch (action.actionType) {
         case PlayerActionType.Forward:
             {
@@ -96,6 +100,16 @@ public class Character : MonoBehaviour
 
     }
 
+    private void clearPostionTransition()
+    {
+        fromPos = toPos = transform.position;
+    }
+
+    private void clearRotationTransition()
+    {
+        fromRot = toRot = transform.rotation;
+    }
+
     private void turnLeft ()
     {
         Vector3 position = getPosition ();
@@ -105,7 +119,11 @@ public class Character : MonoBehaviour
             viewingDirectionIndex = 0;
         }
         position += VIEWING_DIRECTIONS [viewingDirectionIndex];
-        transform.LookAt (position);
+
+        startTime = Time.time;
+        fromRot = transform.rotation;
+        toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
+        //transform.LookAt (position);
     }
 
     private void turnRight ()
@@ -116,7 +134,11 @@ public class Character : MonoBehaviour
             viewingDirectionIndex = VIEWING_DIRECTIONS.Length - 1;
         }
         position += VIEWING_DIRECTIONS [viewingDirectionIndex];
-        transform.LookAt (position);
+
+        startTime = Time.time;
+        fromRot = transform.rotation;
+        toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
+        //transform.LookAt (position);
     }
 
     private void turnBack ()
@@ -125,7 +147,13 @@ public class Character : MonoBehaviour
         viewingDirection.x *= -1;
         viewingDirection.y *= -1;
         position += VIEWING_DIRECTIONS [viewingDirectionIndex];
-        transform.LookAt (position);
+
+        viewingDirectionIndex = (viewingDirectionIndex + 2) % 4;
+
+        startTime = Time.time;
+        fromRot = transform.rotation;
+        toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
+        //transform.LookAt (position);
     }
 
     //Jump up and down and move it all around *lalala
