@@ -15,8 +15,6 @@ public class Character : MonoBehaviour
     private Quaternion fromRot;
     private Quaternion toRot;
 
-    public Transform[] audioPrefabs;
-
     // Use this for initialization
     void Start ()
     {
@@ -37,13 +35,13 @@ public class Character : MonoBehaviour
         float timeFactor = (Time.time - startTime) / TurnTimer.singleton.moveTime;
 
         transform.position = Vector3.Lerp (fromPos, toPos, timeFactor);
-        transform.rotation = Quaternion.Slerp (fromRot, toRot, timeFactor);
+        transform.rotation = Quaternion.Slerp(fromRot, toRot, timeFactor);
     }
 
     public void doAction (PlayerAction action)
     {
-        clearPostionTransition ();
-        clearRotationTransition ();
+        clearPostionTransition();
+        clearRotationTransition();
 
         switch (action.actionType) {
         case PlayerActionType.Forward:
@@ -81,46 +79,57 @@ public class Character : MonoBehaviour
 
     private void moveForward ()
     {
-        Vector3 position = getPosition ();
-        Vector3 targetPos = position + VIEWING_DIRECTIONS [viewingDirectionIndex];
+        Vector3 position = getPosition();
+		Vector3 targetPos = position + VIEWING_DIRECTIONS [viewingDirectionIndex];
 
         //Check if we are on a street and next is also street. In such case walk two steps forward instead of only one.
-        GameObject groundCellContent = GameManager.singleton.levelGen.floorGrid [((int)position.x)] [((int)position.z)];
-        if (groundCellContent != null) {
-            GameObject targetGroundCellContent = GameManager.singleton.levelGen.floorGrid [((int)targetPos.x)] [((int)targetPos.z)];
-            if (groundCellContent.CompareTag ("street") && targetGroundCellContent.CompareTag ("street")) {
-                targetPos += VIEWING_DIRECTIONS [viewingDirectionIndex];
-                ;
-            }
+        GameObject groundCellContent = GameManager.singleton.levelGen.floorGrid[((int) position.x)][((int)position.z)];
+        if (isInLevel(targetPos) && groundCellContent != null) {
+			GameObject targetGroundCellContent = GameManager.singleton.levelGen.floorGrid[((int) targetPos.x)][((int)targetPos.z)];
+			if (groundCellContent.CompareTag("street") && targetGroundCellContent.CompareTag("street")) {
+				Vector3 tempTargetPos = targetPos + VIEWING_DIRECTIONS [viewingDirectionIndex];
+            	if(isInLevel(tempTargetPos)) {
+					targetPos = tempTargetPos;
+				}
+			}
         }
 		
-        GameObject targetCellObstacleContent = null;
+		GameObject targetCellObstacleContent = null;
 
-        if (isInLevel (targetPos)) {
-            targetCellObstacleContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), 0, ((int)targetPos.z)];
-            if (targetCellObstacleContent != null) {
-                Debug.Log ("Found Tag: " + targetCellObstacleContent.tag); 
-            } else {
-                fromPos = position;
-                toPos = targetPos;
-                startTime = Time.time;
-            }
-        }
-    }
+		if(isInLevel(targetPos)) {
+        	targetCellObstacleContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), 0, ((int)targetPos.z)];
+			if(targetCellObstacleContent != null) {
+				Debug.Log ("Found Tag: " + targetCellObstacleContent.tag); 
+			} else {
+				fromPos = position;
+				toPos = targetPos;
+				startTime = Time.time;
+			}
+		}
+		if(reachedTarget(targetPos)) {
+			GameManager.EndGameConditionMet(EndCondition.TargetReached);
+		}
+	}
 
-    private bool isInLevel (Vector3 position)
-    {
-        int levelSize = GameManager.singleton.levelGen.levelSize;
-        return (position.x < levelSize) && (position.x < levelSize) && (position.x >= 0) && (position.y >= 0);
-    }
+	private bool reachedTarget(Vector3 position) {
+		Vector2 target = GameManager.singleton.levelGen.target;
+		int targetX = (int) target.x;
+		int targetY = (int) target.y;
+		return position.x == targetX && position.z == targetY;
+	}
 
-    private void clearPostionTransition ()
+	private bool isInLevel(Vector3 position) {
+		int levelSize = GameManager.singleton.levelGen.levelSize;
+		return (position.x < levelSize) && (position.z < levelSize) && (position.x >= 0) && (position.z >= 0);
+	}
+
+    private void clearPostionTransition()
     {
         fromPos = toPos;
         transform.position = toPos;
     }
 
-    private void clearRotationTransition ()
+    private void clearRotationTransition()
     {
         fromRot = toRot;
         transform.rotation = toRot;
@@ -135,7 +144,7 @@ public class Character : MonoBehaviour
 
         startTime = Time.time;
         fromRot = transform.rotation;
-        toRot = Quaternion.LookRotation (VIEWING_DIRECTIONS [viewingDirectionIndex]);
+        toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
     }
 
     private void turnRight ()
@@ -147,7 +156,7 @@ public class Character : MonoBehaviour
 
         startTime = Time.time;
         fromRot = transform.rotation;
-        toRot = Quaternion.LookRotation (VIEWING_DIRECTIONS [viewingDirectionIndex]);
+        toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
     }
 
     private void turnBack ()
@@ -156,7 +165,7 @@ public class Character : MonoBehaviour
 
         startTime = Time.time;
         fromRot = transform.rotation;
-        toRot = Quaternion.LookRotation (VIEWING_DIRECTIONS [viewingDirectionIndex]);
+        toRot = Quaternion.LookRotation(VIEWING_DIRECTIONS[viewingDirectionIndex]);
     }
 
     //Jump up and down and move it all around *lalala
@@ -167,22 +176,23 @@ public class Character : MonoBehaviour
 
     private void attack ()
     {
-        Vector3 targetPos = toPos + VIEWING_DIRECTIONS [viewingDirectionIndex];
-        GameObject targetCellContent = null;
+        Vector3 targetPos = toPos + VIEWING_DIRECTIONS[viewingDirectionIndex];
+		GameObject targetCellContent = null;
 
-        if (isInLevel (targetPos)) {
-            targetCellContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), ((int)targetPos.y), ((int)targetPos.z)];
-            int currentHeight = (int)targetPos.y;
-            while (targetCellContent != null && targetCellContent.CompareTag("house")) {
-                GameObject.Destroy (targetCellContent);
+		if(isInLevel(targetPos)) {
+        	targetCellContent = GameManager.singleton.levelGen.top3DGrid[((int)targetPos.x), ((int)targetPos.y), ((int)targetPos.z)];
+			int currentHeight = (int)targetPos.y;
+			while (targetCellContent != null && targetCellContent.CompareTag("house"))
+			{
+				GameObject.Destroy(targetCellContent);
 				
-                currentHeight++;
-                if (currentHeight < GameManager.singleton.levelGen.maxHillHeight)
-                    targetCellContent = GameManager.singleton.levelGen.top3DGrid [((int)targetPos.x), currentHeight, ((int)targetPos.z)];
-                else
-                    targetCellContent = null;
-            }
-        }        
+				currentHeight++;
+				if (currentHeight < GameManager.singleton.levelGen.maxHillHeight)
+					targetCellContent = GameManager.singleton.levelGen.top3DGrid[((int)targetPos.x), currentHeight, ((int)targetPos.z)];
+				else
+					targetCellContent = null;
+			}
+		}        
     }
 
     private Vector3 getPosition ()

@@ -34,7 +34,7 @@ public class LevelGenerator : MonoBehaviour
     private List<List<Vector2>> streetPaths;
     private List<List<Vector2>> waterPaths;
     private Vector2 p1Start;
-    private Vector2 target;
+    public Vector2 target;
 
     private string[,,] futureTiles;
 
